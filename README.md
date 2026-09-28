@@ -15,6 +15,12 @@ El repositorio contiene los 21 recortes preparados para el visor en `data/study_
 
 Esta visualización es educativa. La pertenencia del caso a la cohorte procede de los metadatos de CPTAC-PDA; la imagen por sí sola no confirma la histología ni determina invasión vascular.
 
+## Licencias
+
+- El código original de esta aplicación se ofrece bajo la [licencia MIT](LICENSE), sin cobro por la licencia. MIT permite usar, copiar, modificar y redistribuir el código, incluso con fines comerciales o mediante venta, conservando el aviso de licencia y autoría.
+- Las imágenes, los recortes incorporados en `data/study_data.json` y las figuras de `assets/` son derivados de CPTAC-PDA y conservan la licencia CC BY 4.0 de la colección. Véase [DATA-LICENSE.md](DATA-LICENSE.md) para la atribución y los cambios realizados.
+- Las dependencias de terceros conservan sus propias licencias.
+
 ## Construir y publicar
 
 Requisitos para la web: Node.js 22 o superior.
