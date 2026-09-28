@@ -41,6 +41,10 @@
     .dot { display:inline-block; width:9px; height:9px; border-radius:50%; flex:none; }
     .hint, .provenance { font-size:12px; color:#9fb4be; margin:8px 0 0; }
     .provenance a { color:#8ceadd; }
+    .assistant summary { cursor:pointer; color:#9ac6cf; font-weight:650; }
+    .assistant-status { font-size:12px; color:var(--muted); }
+    .assistant-status[data-status=ready] { color:#8ceadd; }
+    .assistant ul { padding-left:19px; margin:9px 0; }
     @media (max-width:900px) { header{align-items:start;flex-direction:column;padding:17px;} main{height:auto;grid-template-columns:1fr;} .viewer{height:60vh;min-height:390px;} aside{max-height:none;} }
   </style>
 </head>
@@ -83,6 +87,17 @@
         <h2 id="selected-title">Corte</h2>
         <img id="selected-image" class="slice-preview" alt="Corte axial seleccionado de RM">
         <p class="preview-meta">Imagen 2D de sustracción. El brillo se ajustó de forma uniforme en todos los cortes.</p>
+      </section>
+      <section class="section">
+        <details class="assistant">
+          <summary>Control con asistente</summary>
+          <p id="assistant-status" class="assistant-status" role="status">Comprobando compatibilidad…</p>
+          <p class="hint">Si abres esta página con un asistente que admite WebMCP, puedes pedirle:</p>
+          <ul class="hint"><li>«Muestra solo el corte 54 en vista axial».</li><li>«Enfoca la referencia de la arteria esplénica».</li><li>«Cambia la opacidad al 50 %».</li></ul>
+          <p class="hint">El asistente controla esta vista y consulta su procedencia. Las marcas anatómicas siguen siendo orientativas. Esta página no incluye un chat propio.</p>
+          <p id="assistant-action" class="hint" aria-live="polite">Aún no se han aplicado cambios desde un asistente.</p>
+          <div class="buttons"><button id="assistant-retry">Comprobar conexión</button><button id="reset-view">Restablecer vista</button></div>
+        </details>
       </section>
       <section class="section">
         <h2>Guardar y consultar</h2>

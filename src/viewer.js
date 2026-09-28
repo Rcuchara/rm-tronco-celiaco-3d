@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { createViewerTools, installViewerTools } from './webmcp.js';
 
 const study = JSON.parse(document.getElementById('study-data').textContent);
 const stage = document.getElementById('stage');
@@ -54,6 +55,9 @@ sliceRange.value = selected;
 radiusRange.max = study.planes.length - 1;
 radiusRange.value = study.planes.length - 1;
 let mode = 'vessels';
+const initialSlice = study.planes[selected].index;
+let currentView = 'oblique';
+let focusedReference = null;
 
 const planes = study.planes.map((p, i) => {
   const opaque = textureLoader.load(p.opaque);
@@ -165,6 +169,12 @@ function updateScene() {
 }
 
 function setView(view) {
+  currentView = view;
+  focusedReference = null;
+  // Finish any pending orbit damping before applying an exact preset.
+  const damping = controls.enableDamping;
+  controls.enableDamping = false;
+  controls.update();
   if (view === 'oblique') {
     camera.up.set(0, 0, 1);
     camera.position.set(145, -205, 150);
@@ -178,7 +188,49 @@ function setView(view) {
   controls.target.set(0, 0, 0);
   camera.lookAt(controls.target);
   controls.update();
+  controls.enableDamping = damping;
   viewButtons.forEach(b => b.classList.toggle('active', b.dataset.view === view));
+}
+
+function getViewerState() {
+  const plane = study.planes[selected];
+  return {
+    slice: plane.index, z_mm: plane.z_mm, mode, view: currentView,
+    radius: Number(radiusRange.value), opacity: Number(opacityRange.value),
+    spacing: currentScale(), references: referenceToggle.checked,
+    visible_slices: study.planes.filter((_, i) => Math.abs(i - selected) <= Number(radiusRange.value)).map(p => p.index),
+    focused_reference: focusedReference,
+    camera: { position: camera.position.toArray(), target: controls.target.toArray(), up: camera.up.toArray() },
+  };
+}
+
+function applySettings(settings) {
+  focusedReference = null;
+  if (settings.slice !== undefined) sliceRange.value = study.planes.findIndex(p => p.index === settings.slice);
+  if (settings.radius !== undefined) radiusRange.value = settings.radius;
+  if (settings.opacity !== undefined) opacityRange.value = settings.opacity;
+  if (settings.spacing !== undefined) zRange.value = settings.spacing;
+  if (settings.references !== undefined) referenceToggle.checked = settings.references;
+  if (settings.mode !== undefined) {
+    mode = settings.mode;
+    modeButtons.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  }
+  if (settings.view !== undefined) setView(settings.view);
+  updateScene();
+}
+
+function focusReference(name) {
+  const object = refObjects.find(o => o.ref.name === name);
+  applySettings({ slice: object.ref.slice_index, radius: 0, mode: 'anatomy', view: 'axial', references: true });
+  const offset = camera.position.clone().sub(controls.target);
+  controls.target.copy(object.sphere.position);
+  camera.position.copy(controls.target).add(offset);
+  controls.update();
+  focusedReference = name;
+}
+
+function resetViewer() {
+  applySettings({ slice: initialSlice, radius: study.planes.length - 1, mode: 'vessels', view: 'oblique', opacity: 72, spacing: 1, references: true });
 }
 
 function resize() {
@@ -191,14 +243,21 @@ function resize() {
 new ResizeObserver(resize).observe(stage);
 resize();
 
-for (const slider of [sliceRange, radiusRange, opacityRange, zRange]) slider.addEventListener('input', updateScene);
-referenceToggle.addEventListener('change', updateScene);
-modeButtons.forEach(button => button.addEventListener('click', () => {
-  mode = button.dataset.mode;
-  modeButtons.forEach(b => b.classList.toggle('active', b === button));
+for (const slider of [sliceRange, radiusRange, opacityRange, zRange]) slider.addEventListener('input', () => {
+  focusedReference = null;
   updateScene();
+});
+referenceToggle.addEventListener('change', () => { focusedReference = null; updateScene(); });
+modeButtons.forEach(button => button.addEventListener('click', () => {
+  applySettings({ mode: button.dataset.mode });
 }));
 viewButtons.forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
+controls.addEventListener('start', () => {
+  currentView = 'custom';
+  focusedReference = null;
+  viewButtons.forEach(b => b.classList.remove('active'));
+});
+document.getElementById('reset-view').addEventListener('click', resetViewer);
 document.getElementById('save-image').addEventListener('click', () => {
   renderer.render(scene, camera);
   const a = document.createElement('a');
@@ -226,3 +285,24 @@ setView('oblique');
 updateScene();
 animate();
 window.viewerReady = true;
+
+const assistantStatus = document.getElementById('assistant-status');
+const assistantAction = document.getElementById('assistant-action');
+const webmcp = installViewerTools({
+  tools: createViewerTools({
+    study, getState: getViewerState, applySettings, focusReference, reset: resetViewer,
+    reportAction: (title, state) => {
+      assistantAction.textContent = `Última acción: ${title}. Corte ${state.slice}, opacidad ${state.opacity} %${state.focused_reference ? `, ${state.focused_reference}` : ''}.`;
+    },
+  }),
+  onStatus: status => {
+    assistantStatus.dataset.status = status;
+    assistantStatus.textContent = {
+      connecting: 'Conectando con el asistente…',
+      ready: 'Disponible para un asistente compatible · 4 herramientas',
+      unavailable: 'Este navegador no ofrece la conexión con asistentes. Puedes usar todos los controles manuales.',
+      error: 'No se pudo activar la conexión. Puedes reintentar y seguir usando los controles manuales.',
+    }[status];
+  },
+});
+document.getElementById('assistant-retry').addEventListener('click', () => { void webmcp.refresh(); });

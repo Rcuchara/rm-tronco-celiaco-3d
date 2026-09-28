@@ -32,6 +32,32 @@ npm run build
 
 `site/index.html` queda listo para abrirse localmente o servirlo como sitio estático. Cada cambio enviado a la rama `main` ejecuta `.github/workflows/pages.yml`, que reconstruye el visor y lo publica en GitHub Pages. `site/`, `node_modules/` y `raw/` están excluidos de Git.
 
+## Control mediante un asistente (WebMCP)
+
+El visor ofrece cuatro herramientas a navegadores y asistentes compatibles con WebMCP. Abre **Control con asistente** para comprobar la conexión y ver la última acción aplicada. No hay un chat ni un modelo de IA incorporado en la página; la conexión depende del navegador/asistente con el que la abras. Los controles manuales siguen funcionando si WebMCP no está disponible.
+
+| Herramienta | Función |
+| --- | --- |
+| `rm_obtener_contexto` | Lee la procedencia, licencia, cortes disponibles, referencias manuales y estado real de la cámara y controles. No devuelve imágenes en base64. |
+| `rm_ajustar_vista` | Aplica ajustes de corte, modo, orientación, radio de cortes vecinos, opacidad, separación y visibilidad de referencias. |
+| `rm_enfocar_referencia` | Selecciona el corte de una marca existente y centra en ella una vista axial anatómica. |
+| `rm_restaurar_vista` | Recupera los controles y la cámara iniciales. |
+
+Ejemplos para pedir al asistente:
+
+- «Muestra solo el corte 54 en vista axial».
+- «Enfoca la referencia de la arteria esplénica».
+- «Cambia la opacidad al 50 % y muestra todos los cortes».
+- «Consulta la procedencia de estas imágenes».
+
+Los números de corte son los originales **44–64**. La opacidad admite **10–100 %**, el radio **0–20** y la separación visual **1–3**, en incrementos de **0,1**. Todos los parámetros se validan antes de aplicar cambios. Las vistas axial/coronal/oblicua orientan la cámara del apilado; no generan una reconstrucción multiplanar nueva. Enfocar usa una marca manual ya existente, sin detección automática de anatomía.
+
+La integración usa `document.modelContext.registerTool` y admite `navigator.modelContext.registerTool` como compatibilidad con puentes anteriores. Los registros se limpian con `AbortController` al salir de la página y se restablecen al volver desde la caché del navegador. WebMCP sigue evolucionando y no está disponible en todos los navegadores. Puede comprobarse de nuevo desde el botón **Comprobar conexión**.
+
+Implementación original inspirada en el patrón de registro del [ejemplo de Runme](https://github.com/runmedev/web/blob/4a74e79efa18d78d63930112818b560bb10a0bb3/app/src/components/WebMcp/WebMcpToolRegistrationHost.tsx#L65), adaptada a herramientas específicas del visor. No se expone ejecución arbitraria de JavaScript. Referencias: [API imperativa de WebMCP](https://developer.chrome.com/docs/ai/webmcp/imperative-api) y [especificación](https://webmachinelearning.github.io/webmcp/).
+
+`npm run check` ejecuta pruebas de validación, registro, compatibilidad y limpieza, y comprueba el sitio construido. Para una prueba completa se necesita además abrir la página en un asistente compatible, llamar a las herramientas y comprobar los cambios visibles.
+
 ## Regenerar los planos desde los DICOM públicos
 
 Solo hace falta para cambiar el procesamiento de imagen o el caso. Se requiere Python 3.11 o superior.
@@ -48,10 +74,11 @@ El script decodifica DICOM con `pydicom`, prepara cada imagen 2D y la lee median
 ## Estructura
 
 - `src/viewer.js`: escena 3D e interacción con Three.js.
+- `src/webmcp.js`: herramientas para asistentes, validación y ciclo de registro.
 - `src/template.html`: interfaz del visor.
 - `data/study_data.json`: recortes y referencias anatómicas.
 - `assets/`: figuras derivadas para consulta.
 - `scripts/build.mjs`: compilación reproducible del sitio.
 - `scripts/prepare_data.py`: preparación opcional desde DICOM.
 
-El visor no envía imágenes ni datos del usuario a un servidor. Las visitas al sitio están sujetas a las prácticas de GitHub Pages; el enlace externo a IDC abre ese servicio por separado.
+El visor no sube imágenes ni incorpora servicios de IA de pago. Al utilizar WebMCP, el asistente que invoque sus herramientas recibe los metadatos públicos del estudio y el estado del visor; su tratamiento depende de ese asistente. Las visitas al sitio están sujetas a las prácticas de GitHub Pages; el enlace externo a IDC abre ese servicio por separado.

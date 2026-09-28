@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "node --check src/viewer.js && npm run build && node scripts/verify.mjs"
+    "test": "node --test scripts/test-webmcp.mjs",
+    "check": "node --check src/viewer.js && node --check src/webmcp.js && npm test && npm run build && node scripts/verify.mjs"
   },
   "dependencies": {
     "three": "0.186.1"
