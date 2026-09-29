@@ -1,0 +1,1591 @@
+{
+  "id": "ct",
+  "anatomy": "celiac",
+  "title": "Tronco celíaco · TC arterial de cortes finos",
+  "subtitle": "Paciente público C3L-02112 · TC real con contraste",
+  "summary": "Recorte de TC arterial ART THINS de CPTAC-PDA. Los cortes conservan su tamaño y separación originales y muestran la región celíaca con sus ramas proximales. Es un paciente diferente al de la opción RM.",
+  "modality": "CT",
+  "sequence": "ART THINS",
+  "patientId": "C3L-02112",
+  "source": {
+    "url": "https://www.cancerimagingarchive.net/collection/cptac-pda/",
+    "doi": "10.7937/K9/TCIA.2018.SC20FO18",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "citation": "National Cancer Institute Clinical Proteomic Tumor Analysis Consortium (CPTAC) (2018). The Clinical Proteomic Tumor Analysis Consortium Pancreatic Ductal Adenocarcinoma Collection (CPTAC-PDA), Version 15 [dataset]. The Cancer Imaging Archive. doi:10.7937/K9/TCIA.2018.SC20FO18.",
+    "collection": "CPTAC-PDA",
+    "patient_id": "C3L-02112",
+    "series_instance_uid": "1.3.6.1.4.1.14519.5.2.1.1078.3273.100695794070451892455483306265",
+    "study_instance_uid": "1.3.6.1.4.1.14519.5.2.1.1078.3273.131112255180298386283634139859",
+    "idc_series_uuid": "d5eae19d-ef93-49c8-b2ac-33e0bffb9a92",
+    "download_url": "https://services.cancerimagingarchive.net/nbia-api/services/v1/getImage?SeriesInstanceUID=1.3.6.1.4.1.14519.5.2.1.1078.3273.100695794070451892455483306265",
+    "idc_bucket": "https://idc-open-data.s3.amazonaws.com/d5eae19d-ef93-49c8-b2ac-33e0bffb9a92/",
+    "source_bytes": 193178242,
+    "integrity": "S3 ETag/MD5 verification during download; selected original instances additionally listed with SHA-256 in provenance.json."
+  },
+  "resolution": "0,703125 × 0,703125 × 0,625 mm; 65 cortes originales del recorte, sin interpolación espacial.",
+  "source_resolution": {
+    "dimensions": [
+      512,
+      512,
+      365
+    ],
+    "spacing_mm": [
+      0.703125,
+      0.703125,
+      0.625
+    ],
+    "dtype": "int16",
+    "sliceThickness_mm": 0.625,
+    "manufacturer": "GE MEDICAL SYSTEMS",
+    "model": "Revolution CT"
+  },
+  "display_resolution": {
+    "dimensions": [
+      205,
+      152,
+      65
+    ],
+    "spacing_mm": [
+      0.703125,
+      0.703125,
+      0.625
+    ],
+    "dtype": "uint8",
+    "resampled": false,
+    "cropped": true
+  },
+  "volume": {
+    "file": "arterial.u8.gz",
+    "url": "arterial.u8.gz",
+    "dimensions": [
+      205,
+      152,
+      65
+    ],
+    "spacing": [
+      0.703125,
+      0.703125,
+      0.625
+    ],
+    "origin": [
+      60.46875,
+      67.5,
+      -190.0
+    ],
+    "directions": [
+      [
+        -1.0,
+        -0.0,
+        0.0
+      ],
+      [
+        -0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        -0.0,
+        -0.0,
+        1.0
+      ]
+    ],
+    "coordinateSystem": "RAS",
+    "coordinate_system": "RAS",
+    "units": "mm",
+    "dtype": "uint8",
+    "encoding": "gzip",
+    "order": "x-fastest",
+    "sourceIndexOffset": [
+      170,
+      160,
+      176
+    ],
+    "window": {
+      "center": 175,
+      "width": 550,
+      "source_min": -100.0,
+      "source_max": 450.0,
+      "units": "HU",
+      "method": "fixed CT display window for the enhanced arteries"
+    },
+    "sliceThickness": 0.625,
+    "sha256Raw": "965a32e88987732dd2b28eadad49c2d41d452b8650e1fa2db1a95b34d054d38d",
+    "sha256Compressed": "018cde94cbb4ede9997f0cedffb53592f34af28f9ff92808cd6cc75af888aba4"
+  },
+  "defaultSlice": 32,
+  "defaultRadius": 10,
+  "landmarks": [],
+  "meshes": [],
+  "source_slices": [
+    {
+      "index": 0,
+      "source_slice_index": 176,
+      "InstanceNumber": 189,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.163351356326608725767213923953",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -190.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -190.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -190.0
+      ]
+    },
+    {
+      "index": 1,
+      "source_slice_index": 177,
+      "InstanceNumber": 188,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.337961981765126655736082238850",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -189.375
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -189.375
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -189.375
+      ]
+    },
+    {
+      "index": 2,
+      "source_slice_index": 178,
+      "InstanceNumber": 187,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.210732248638875174991243950269",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -188.75
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -188.75
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -188.75
+      ]
+    },
+    {
+      "index": 3,
+      "source_slice_index": 179,
+      "InstanceNumber": 186,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.674711150585275647241179941231",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -188.125
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -188.125
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -188.125
+      ]
+    },
+    {
+      "index": 4,
+      "source_slice_index": 180,
+      "InstanceNumber": 185,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.297114275326572829723560404655",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -187.5
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -187.5
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -187.5
+      ]
+    },
+    {
+      "index": 5,
+      "source_slice_index": 181,
+      "InstanceNumber": 184,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.242888732271550290819557186570",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -186.875
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -186.875
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -186.875
+      ]
+    },
+    {
+      "index": 6,
+      "source_slice_index": 182,
+      "InstanceNumber": 183,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.140244859121501968119638962107",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -186.25
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -186.25
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -186.25
+      ]
+    },
+    {
+      "index": 7,
+      "source_slice_index": 183,
+      "InstanceNumber": 182,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.607687498729174064197959713124",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -185.625
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -185.625
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -185.625
+      ]
+    },
+    {
+      "index": 8,
+      "source_slice_index": 184,
+      "InstanceNumber": 181,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.145868913922342355797914240172",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -185.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -185.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -185.0
+      ]
+    },
+    {
+      "index": 9,
+      "source_slice_index": 185,
+      "InstanceNumber": 180,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.191246194712171220945902023793",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -184.375
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -184.375
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -184.375
+      ]
+    },
+    {
+      "index": 10,
+      "source_slice_index": 186,
+      "InstanceNumber": 179,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.240000132308387237184582237655",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -183.75
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -183.75
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -183.75
+      ]
+    },
+    {
+      "index": 11,
+      "source_slice_index": 187,
+      "InstanceNumber": 178,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.200748423668469814020479315064",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -183.125
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -183.125
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -183.125
+      ]
+    },
+    {
+      "index": 12,
+      "source_slice_index": 188,
+      "InstanceNumber": 177,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.241437429312885500782761173968",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -182.5
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -182.5
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -182.5
+      ]
+    },
+    {
+      "index": 13,
+      "source_slice_index": 189,
+      "InstanceNumber": 176,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.165124195312835133136147244523",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -181.875
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -181.875
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -181.875
+      ]
+    },
+    {
+      "index": 14,
+      "source_slice_index": 190,
+      "InstanceNumber": 175,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.196157108997941197043676010569",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -181.25
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -181.25
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -181.25
+      ]
+    },
+    {
+      "index": 15,
+      "source_slice_index": 191,
+      "InstanceNumber": 174,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.191819859397250257011055799753",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -180.625
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -180.625
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -180.625
+      ]
+    },
+    {
+      "index": 16,
+      "source_slice_index": 192,
+      "InstanceNumber": 173,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.687629936498907383361784809853",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -180.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -180.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -180.0
+      ]
+    },
+    {
+      "index": 17,
+      "source_slice_index": 193,
+      "InstanceNumber": 172,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.860597705561950960240793087952",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -179.375
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -179.375
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -179.375
+      ]
+    },
+    {
+      "index": 18,
+      "source_slice_index": 194,
+      "InstanceNumber": 171,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.612733701555285053103584497848",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -178.75
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -178.75
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -178.75
+      ]
+    },
+    {
+      "index": 19,
+      "source_slice_index": 195,
+      "InstanceNumber": 170,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.231963828811720056829918256838",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -178.125
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -178.125
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -178.125
+      ]
+    },
+    {
+      "index": 20,
+      "source_slice_index": 196,
+      "InstanceNumber": 169,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.117204656920279647615007111992",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -177.5
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -177.5
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -177.5
+      ]
+    },
+    {
+      "index": 21,
+      "source_slice_index": 197,
+      "InstanceNumber": 168,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.125521143407312119410729173012",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -176.875
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -176.875
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -176.875
+      ]
+    },
+    {
+      "index": 22,
+      "source_slice_index": 198,
+      "InstanceNumber": 167,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.207866396420685649680650760316",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -176.25
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -176.25
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -176.25
+      ]
+    },
+    {
+      "index": 23,
+      "source_slice_index": 199,
+      "InstanceNumber": 166,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.233864615075074795262329793981",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -175.625
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -175.625
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -175.625
+      ]
+    },
+    {
+      "index": 24,
+      "source_slice_index": 200,
+      "InstanceNumber": 165,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.268876848469713087249541814478",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -175.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -175.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -175.0
+      ]
+    },
+    {
+      "index": 25,
+      "source_slice_index": 201,
+      "InstanceNumber": 164,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.925461051487746949938685593441",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -174.375
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -174.375
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -174.375
+      ]
+    },
+    {
+      "index": 26,
+      "source_slice_index": 202,
+      "InstanceNumber": 163,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.355001652750978133071232680566",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -173.75
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -173.75
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -173.75
+      ]
+    },
+    {
+      "index": 27,
+      "source_slice_index": 203,
+      "InstanceNumber": 162,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.238983869493628580127213764557",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -173.125
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -173.125
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -173.125
+      ]
+    },
+    {
+      "index": 28,
+      "source_slice_index": 204,
+      "InstanceNumber": 161,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.452260927339003287530323016813",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -172.5
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -172.5
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -172.5
+      ]
+    },
+    {
+      "index": 29,
+      "source_slice_index": 205,
+      "InstanceNumber": 160,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.267615660017153955971979145705",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -171.875
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -171.875
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -171.875
+      ]
+    },
+    {
+      "index": 30,
+      "source_slice_index": 206,
+      "InstanceNumber": 159,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.152717082763496493500543082974",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -171.25
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -171.25
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -171.25
+      ]
+    },
+    {
+      "index": 31,
+      "source_slice_index": 207,
+      "InstanceNumber": 158,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.195273949717589546986306735596",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -170.625
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -170.625
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -170.625
+      ]
+    },
+    {
+      "index": 32,
+      "source_slice_index": 208,
+      "InstanceNumber": 157,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.272062527909279163342704115489",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -170.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -170.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -170.0
+      ]
+    },
+    {
+      "index": 33,
+      "source_slice_index": 209,
+      "InstanceNumber": 156,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.354384577006681407483217724845",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -169.375
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -169.375
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -169.375
+      ]
+    },
+    {
+      "index": 34,
+      "source_slice_index": 210,
+      "InstanceNumber": 155,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.250326097480595043261342270104",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -168.75
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -168.75
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -168.75
+      ]
+    },
+    {
+      "index": 35,
+      "source_slice_index": 211,
+      "InstanceNumber": 154,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.194343056055011204989145110988",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -168.125
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -168.125
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -168.125
+      ]
+    },
+    {
+      "index": 36,
+      "source_slice_index": 212,
+      "InstanceNumber": 153,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.248477373365642671541421167075",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -167.5
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -167.5
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -167.5
+      ]
+    },
+    {
+      "index": 37,
+      "source_slice_index": 213,
+      "InstanceNumber": 152,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.407552328445784933368077846971",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -166.875
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -166.875
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -166.875
+      ]
+    },
+    {
+      "index": 38,
+      "source_slice_index": 214,
+      "InstanceNumber": 151,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.297866781897937631013831200754",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -166.25
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -166.25
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -166.25
+      ]
+    },
+    {
+      "index": 39,
+      "source_slice_index": 215,
+      "InstanceNumber": 150,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.230688101136926897636446598017",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -165.625
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -165.625
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -165.625
+      ]
+    },
+    {
+      "index": 40,
+      "source_slice_index": 216,
+      "InstanceNumber": 149,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.545455782303214312871548212476",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -165.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -165.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -165.0
+      ]
+    },
+    {
+      "index": 41,
+      "source_slice_index": 217,
+      "InstanceNumber": 148,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.261627177590871319804317452498",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -164.375
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -164.375
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -164.375
+      ]
+    },
+    {
+      "index": 42,
+      "source_slice_index": 218,
+      "InstanceNumber": 147,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.373679322743115015321646925251",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -163.75
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -163.75
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -163.75
+      ]
+    },
+    {
+      "index": 43,
+      "source_slice_index": 219,
+      "InstanceNumber": 146,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.284893441542875592266300195727",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -163.125
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -163.125
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -163.125
+      ]
+    },
+    {
+      "index": 44,
+      "source_slice_index": 220,
+      "InstanceNumber": 145,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.233817676811610421813954610753",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -162.5
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -162.5
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -162.5
+      ]
+    },
+    {
+      "index": 45,
+      "source_slice_index": 221,
+      "InstanceNumber": 144,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.110425771412947102039788677655",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -161.875
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -161.875
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -161.875
+      ]
+    },
+    {
+      "index": 46,
+      "source_slice_index": 222,
+      "InstanceNumber": 143,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.161747083001118422136719830102",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -161.25
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -161.25
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -161.25
+      ]
+    },
+    {
+      "index": 47,
+      "source_slice_index": 223,
+      "InstanceNumber": 142,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.207714094106492355057261129592",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -160.625
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -160.625
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -160.625
+      ]
+    },
+    {
+      "index": 48,
+      "source_slice_index": 224,
+      "InstanceNumber": 141,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.208881382142030996715447751516",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -160.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -160.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -160.0
+      ]
+    },
+    {
+      "index": 49,
+      "source_slice_index": 225,
+      "InstanceNumber": 140,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.328837987573159585777449069298",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -159.375
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -159.375
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -159.375
+      ]
+    },
+    {
+      "index": 50,
+      "source_slice_index": 226,
+      "InstanceNumber": 139,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.249280595526829890568791720323",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -158.75
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -158.75
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -158.75
+      ]
+    },
+    {
+      "index": 51,
+      "source_slice_index": 227,
+      "InstanceNumber": 138,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.323607477068100696736063761242",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -158.125
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -158.125
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -158.125
+      ]
+    },
+    {
+      "index": 52,
+      "source_slice_index": 228,
+      "InstanceNumber": 137,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.104332668155756313265357150839",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -157.5
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -157.5
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -157.5
+      ]
+    },
+    {
+      "index": 53,
+      "source_slice_index": 229,
+      "InstanceNumber": 136,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.136390046673114619453311696683",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -156.875
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -156.875
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -156.875
+      ]
+    },
+    {
+      "index": 54,
+      "source_slice_index": 230,
+      "InstanceNumber": 135,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.286070200791516973306552816587",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -156.25
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -156.25
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -156.25
+      ]
+    },
+    {
+      "index": 55,
+      "source_slice_index": 231,
+      "InstanceNumber": 134,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.308044342369428652169756851332",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -155.625
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -155.625
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -155.625
+      ]
+    },
+    {
+      "index": 56,
+      "source_slice_index": 232,
+      "InstanceNumber": 133,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.887139132363047346818496655909",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -155.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -155.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -155.0
+      ]
+    },
+    {
+      "index": 57,
+      "source_slice_index": 233,
+      "InstanceNumber": 132,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.811068279327351326600612192096",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -154.375
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -154.375
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -154.375
+      ]
+    },
+    {
+      "index": 58,
+      "source_slice_index": 234,
+      "InstanceNumber": 131,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.135372524829216629339865880546",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -153.75
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -153.75
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -153.75
+      ]
+    },
+    {
+      "index": 59,
+      "source_slice_index": 235,
+      "InstanceNumber": 130,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.232819877518343874958585110128",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -153.125
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -153.125
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -153.125
+      ]
+    },
+    {
+      "index": 60,
+      "source_slice_index": 236,
+      "InstanceNumber": 129,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.225578114290674933892442477843",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -152.5
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -152.5
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -152.5
+      ]
+    },
+    {
+      "index": 61,
+      "source_slice_index": 237,
+      "InstanceNumber": 128,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.281026796393491679229863937123",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -151.875
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -151.875
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -151.875
+      ]
+    },
+    {
+      "index": 62,
+      "source_slice_index": 238,
+      "InstanceNumber": 127,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.446643382006892097967378955632",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -151.25
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -151.25
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -151.25
+      ]
+    },
+    {
+      "index": 63,
+      "source_slice_index": 239,
+      "InstanceNumber": 126,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.111241706098473464622928203201",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -150.625
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -150.625
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -150.625
+      ]
+    },
+    {
+      "index": 64,
+      "source_slice_index": 240,
+      "InstanceNumber": 125,
+      "SOPInstanceUID": "1.3.6.1.4.1.14519.5.2.1.1078.3273.117396574062122628699818039237",
+      "ImagePositionPatient": [
+        -180.0,
+        -180.0,
+        -150.0
+      ],
+      "position_ras": [
+        180.0,
+        180.0,
+        -150.0
+      ],
+      "crop_origin_ras": [
+        60.46875,
+        67.5,
+        -150.0
+      ]
+    }
+  ],
+  "sourceOriginalSliceNumbers": [
+    189,
+    188,
+    187,
+    186,
+    185,
+    184,
+    183,
+    182,
+    181,
+    180,
+    179,
+    178,
+    177,
+    176,
+    175,
+    174,
+    173,
+    172,
+    171,
+    170,
+    169,
+    168,
+    167,
+    166,
+    165,
+    164,
+    163,
+    162,
+    161,
+    160,
+    159,
+    158,
+    157,
+    156,
+    155,
+    154,
+    153,
+    152,
+    151,
+    150,
+    149,
+    148,
+    147,
+    146,
+    145,
+    144,
+    143,
+    142,
+    141,
+    140,
+    139,
+    138,
+    137,
+    136,
+    135,
+    134,
+    133,
+    132,
+    131,
+    130,
+    129,
+    128,
+    127,
+    126,
+    125
+  ],
+  "processing": {
+    "dicomDecoder": "pydicom 3.0.2",
+    "planeReader": "OpenSlide ImageSlide.read_region 1.4.6",
+    "openslideRole": "Lectura del recorte de cada imagen ya decodificada por pydicom y transformada a una ventana HU.",
+    "geometry": "Recorte en la rejilla DICOM original, ordenado por posición física y convertido de LPS a RAS. Sin interpolación espacial.",
+    "intensityWindow": "Ventana fija -100 a 450 HU, convertida a escala de grises de 8 bits para visualización web."
+  },
+  "limitations": [
+    "TC arterial clínica convencional; esta adquisición no es TC con conteo de fotones.",
+    "El caso C3L-02112 es distinto del C3L-03129 de la opción RM; las vistas no están registradas entre sí.",
+    "La ventana HU se guarda como 8 bits de visualización; este archivo web no sustituye el DICOM original para medir HU.",
+    "No se incluyen segmentaciones originales de las ramas arteriales ni etiquetas anatómicas individuales para esta serie.",
+    "El apilado y la MIP muestran los valores de imagen; no aíslan automáticamente una arteria del tejido vecino.",
+    "La serie se ofrece como material público para exploración anatómica; no se presenta como una referencia clínica validada o gold standard."
+  ],
+  "files": {
+    "arterial.u8.gz": {
+      "bytes": 1615392,
+      "sha256": "018cde94cbb4ede9997f0cedffb53592f34af28f9ff92808cd6cc75af888aba4"
+    },
+    "preview.png": {
+      "bytes": 21228,
+      "sha256": "96937d05f22017b545b2c77544e8eb4e9a0fa03a5c80fcc79c0d920e1544a3b3"
+    },
+    "mip-preview.png": {
+      "bytes": 21458,
+      "sha256": "9706bca55240b9278154b45ac89abba8d5a4de741e338445c095d99e33b7bcc4"
+    },
+    "ATTRIBUTION.txt": {
+      "bytes": 849,
+      "sha256": "61b069b9f6743c3cf5a87d53138adc34af34ab5664850d5de378032d90ccfd80"
+    },
+    "provenance.json": {
+      "bytes": 13539,
+      "sha256": "e616a328365ad2c21afb6b077dca8b7ba55b03b06c63a12c8bdf42186a6d9068"
+    }
+  }
+}

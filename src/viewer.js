@@ -306,3 +306,5 @@ const webmcp = installViewerTools({
   },
 });
 document.getElementById('assistant-retry').addEventListener('click', () => { void webmcp.refresh(); });
+
+document.getElementById('dataset-select').addEventListener('change', event => { if (event.target.value === 'ct') location.assign('./celiaco/tc/'); });

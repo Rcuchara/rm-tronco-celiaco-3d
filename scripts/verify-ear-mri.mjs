@@ -76,11 +76,11 @@ for (const [file, expected] of Object.entries(manifest.files)) {
 }
 assert.deepEqual(await readFile(join(publishedDir, 'manifest.json')), manifestBytes);
 assert.equal(hash(await readFile(join(publishedDir, volume.file))), hash(compressed));
-assert.deepEqual(await readdir(join(root, 'site', 'oido', 'data')), ['mri'], 'Publish only the selected MRI dataset');
+assert.deepEqual(await readdir(join(root, 'site', 'oido', 'data')), ['mri', 'reference'], 'MRI and ex vivo reference remain separate datasets');
 const html = await readFile(join(root, 'site', 'oido', 'index.html'), 'utf8');
 assert.ok(!html.includes('__EAR_MRI_') && !html.includes('file:///'));
 for (const id of ['stage', 'selected-canvas', 'slice-range', 'radius-range', 'opacity-range', 'spacing-range', 'reference-list']) {
   assert.ok(html.includes(`id="${id}"`), `Missing viewer control: ${id}`);
 }
-assert.ok(html.includes('mri_oido_obtener_contexto'));
+assert.ok(html.includes('mri_oido'));
 console.log(`Auditory MRI: ${volume.dimensions.join(' × ')} voxels, physical geometry, reference positions, grayscale signal and published bytes verified.`);

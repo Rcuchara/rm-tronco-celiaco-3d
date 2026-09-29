@@ -1,0 +1,9 @@
+CPTAC-PDA / TCIA / NCI Imaging Data Commons
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+National Cancer Institute Clinical Proteomic Tumor Analysis Consortium (CPTAC). (2018). The Clinical Proteomic Tumor Analysis Consortium Pancreatic Ductal Adenocarcinoma Collection (CPTAC-PDA) (Version 15) [dataset]. The Cancer Imaging Archive. https://doi.org/10.7937/K9/TCIA.2018.SC20FO18
+
+Changes: native-spacing spatial crop, HU display window, 8-bit grayscale conversion, gzip compression and a maximum-intensity projection preview. No spatial resampling and no independent anatomical labels.
+Case: C3L-02112; original series: 1.3.6.1.4.1.14519.5.2.1.1078.3273.100695794070451892455483306265
+Original collection page: https://www.cancerimagingarchive.net/collection/cptac-pda/

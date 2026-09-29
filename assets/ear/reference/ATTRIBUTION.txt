@@ -1,0 +1,9 @@
+# F01: laberinto óseo humano
+
+Wimmer W, Anschuetz L, Weder S, Wagner F, Delingette H, Caversaccio M (2019). Human Bony Labyrinth: Co-Registered CT and micro-CT Images, Surface Models and Anatomical Landmarks. Zenodo.
+
+[Fuente y descarga](https://zenodo.org/records/3355272) · [Licencia CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+Modificaciones: NIfTI microCT a uint8 con ventana percentil 0.5–99.5; máscara binaria comprimida; PLY a GLB con normales de vértice calculadas. Se conservan la matriz de adquisición, el espaciado físico, las coordenadas RAS en milímetros y todos los vértices y triángulos de la superficie original. Los colores son de presentación. Los archivos no incorporan las imágenes clínicas CT del mismo archivo ZIP.
+
+El fichero GLB conserva unidades médicas milimétricas, en lugar de convertirlas a metros. Las coordenadas numéricas RAS del NIfTI se conservan para el espécimen; no certifican orientación anatómica de una cabeza. Visor: ejes del espécimen X/Y/Z. La muestra ex vivo no está registrada al paciente de RM. El órgano de Corti, células ciliadas y canalículos microscópicos no están segmentados individualmente.

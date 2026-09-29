@@ -1,11 +1,17 @@
 # Anatomía en 3D: tronco celíaco y oído
 
-Dos visores estáticos con datos médicos públicos, preparados para explorar cortes y relaciones espaciales en el navegador.
+Dos áreas anatómicas con datos médicos públicos, preparadas para explorar cortes y relaciones espaciales en el navegador. Las pestañas mantienen la anatomía seleccionada y el selector de técnica permite consultar los conjuntos disponibles.
 
 | Visor | Contenido | Enlace público |
 | --- | --- | --- |
-| Tronco celíaco | 21 cortes de resonancia magnética con referencias manuales | [Abrir RM](https://rcuchara.github.io/rm-tronco-celiaco-3d/) |
-| Aparato auditivo | Cortes reales de RM CISS de un paciente individual | [Abrir oído 3D](https://rcuchara.github.io/rm-tronco-celiaco-3d/oido/) |
+| Tronco celíaco · RM | 21 cortes con referencias manuales; caso C3L-03129 | [Abrir RM](https://rcuchara.github.io/rm-tronco-celiaco-3d/) |
+| Tronco celíaco · TC arterial | 65 cortes finos con contraste; caso C3L-02112 | [Abrir TC](https://rcuchara.github.io/rm-tronco-celiaco-3d/celiaco/tc/) |
+| Aparato auditivo · RM CISS | Cortes reales de un paciente individual, VS-SEG-023 | [Abrir RM del oído](https://rcuchara.github.io/rm-tronco-celiaco-3d/oido/) |
+| Aparato auditivo · microTC | Espécimen F01 ex vivo, cortes y superficie original del laberinto óseo | [Abrir microTC](https://rcuchara.github.io/rm-tronco-celiaco-3d/oido/?tecnica=reference) |
+
+Cada recurso muestra su caso, modalidad, muestreo y procedencia. Los estudios de RM y TC corresponden a pacientes o especímenes diferentes: cambiar la técnica carga otro conjunto y no registra ni superpone automáticamente ambas anatomías.
+
+El [registro de repositorios revisados](docs/REPOSITORIOS-IMAGENES.md) recoge fuentes adicionales de sincrotrón, RM, PCCT y otras anatomías, con sus licencias, tamaños y estado de acceso. Una fuente documentada allí no implica que su volumen ya esté integrado en el visor.
 
 ## Tronco celíaco
 
@@ -21,6 +27,17 @@ Visor web de 21 cortes de resonancia magnética apilados para explorar el tronco
 El repositorio contiene los 21 recortes preparados para el visor en `data/study_data.json`, además de dos figuras derivadas. Los DICOM originales no se duplican aquí; se consultan en [IDC](https://viewer.imaging.datacommons.cancer.gov/v3/viewer/?StudyInstanceUIDs=1.3.6.1.4.1.14519.5.2.1.1078.3273.640735449193782945076350642934&initialSeriesInstanceUID=1.3.6.1.4.1.14519.5.2.1.1078.3273.156983346663748836803923712840).
 
 Esta visualización es educativa. La pertenencia del caso a la cohorte procede de los metadatos de CPTAC-PDA; la imagen por sí sola no confirma la histología ni determina invasión vascular.
+
+### Opción de TC arterial
+
+La opción [TC arterial](https://rcuchara.github.io/rm-tronco-celiaco-3d/celiaco/tc/) utiliza el caso **C3L-02112** de la misma colección CPTAC-PDA, serie **ART THINS**, UID `1.3.6.1.4.1.14519.5.2.1.1078.3273.100695794070451892455483306265`. Es TC convencional con contraste; no es TC con conteo de fotones (PCCT).
+
+- Fuente: **512 × 512 × 365** vóxeles; **0,703125 × 0,703125 × 0,625 mm**.
+- Recurso preparado: **205 × 152 × 65**, recortado en la cuadrícula original sin interpolación espacial.
+- Se aplica una ventana de **−100 a 450 HU** y se guarda como uint8 gzip, con X variando más rápido. El archivo web conserva su geometría RAS en mm, pero no el rango completo para medir unidades HU.
+- Los cortes y la proyección de intensidad máxima (MIP) permiten explorar el contraste vascular y su contexto. No se incluye una segmentación de las ramas arteriales ni referencias anatómicas individuales para esta serie.
+
+La RM utiliza **C3L-03129** y la TC utiliza **C3L-02112**; sus vistas no están registradas entre sí. Los detalles, hashes y números originales de cada corte están en `assets/celiac/ct/manifest.json` y `provenance.json`. Los datos y sus derivados conservan **CC BY 4.0**.
 
 ## Aparato auditivo: resonancia magnética en 3D
 
@@ -58,11 +75,25 @@ Las posiciones y separaciones se derivan de `ImagePositionPatient`, `ImageOrient
 
 Los contornos de cóclea (`Cochlea`) y tumor (`TV`) proceden del RTSTRUCT publicado para la misma serie. Los marcadores son centros calculados de las cajas que contienen esos contornos; no son puntos anatómicos identificados de nuevo ni segmentaciones nuevas. El volumen web contiene muestras **uint8 comprimidas con gzip**, con X variando más rápido. La ventana DICOM utilizada tiene centro **278** y ancho **637**; la conversión a 8 bits reduce el rango de intensidad para su visualización y conserva el muestreo espacial adquirido.
 
+### Opción de microTC: referencia ex vivo F01
+
+El selector del oído permite abrir **MicroTC F01**, un espécimen humano ex vivo de *Human Bony Labyrinth: Co-Registered CT and micro-CT Images, Surface Models and Anatomical Landmarks*. Fuente: Wimmer, Anschuetz, Weder, Wagner, Delingette y Caversaccio (2019), [Zenodo, DOI 10.5281/zenodo.3355272](https://doi.org/10.5281/zenodo.3355272), **CC BY 4.0**. El [artículo del conjunto](https://pmc.ncbi.nlm.nih.gov/articles/PMC6864122/) documenta sus referencias anatómicas.
+
+- Imagen completa de **250 × 336 × 348**, aproximadamente **0,0607 mm (60,7 µm)** por eje, sin remuestreo espacial; intensidad convertida de int16 a uint8 para la web.
+- Máscara original del laberinto óseo, conservada sin subdivisiones nuevas, y superficie original convertida de PLY a GLB (**174.318 triángulos**).
+- Cinco puntos originales: **ventana redonda (RW), centro de la vuelta basal (C), helicotrema (A), ventana oval (OW) y centro del vestíbulo (V)**.
+- Representaciones de cortes, MIP, superficie y combinación de estructura con cortes. La MIP proyecta la intensidad de los planos seleccionados; no añade segmentaciones.
+
+El volumen, la máscara, la superficie y los puntos comparten las coordenadas físicas del archivo fuente. Se conserva numéricamente su marco NIfTI de adquisición en mm; la orientación anatómica del espécimen respecto de esos ejes no está comprobada, por lo que se muestran como **X/Y/Z del espécimen**. No se registran al paciente de RM.
+
+La etiqueta de laberinto óseo contiene su forma conjunta y no ofrece etiquetas separadas para cada canal semicircular, cóclea o vestíbulo. Los puntos son referencias y no segmentaciones de esas estructuras. Esta fuente no incluye etiquetas individuales de nervios, huesecillos, laberinto membranoso o canalículos microscópicos. Su tamaño de vóxel expresa el muestreo adquirido, no una medición independiente de resolución efectiva.
+
 ## Licencias
 
 - El código original de esta aplicación se ofrece bajo la [licencia MIT](LICENSE), sin cobro por la licencia. MIT permite usar, copiar, modificar y redistribuir el código, incluso con fines comerciales o mediante venta, conservando el aviso de licencia y autoría.
 - Los recortes incorporados en `data/study_data.json` y las dos figuras `assets/RM_tronco_celiaco_*.png` son derivados de CPTAC-PDA y conservan su licencia CC BY 4.0.
 - Los recursos de RM del oído proceden de Vestibular-Schwannoma-SEG y conservan CC BY 4.0. Véase [DATA-LICENSE.md](DATA-LICENSE.md) para la atribución independiente y los cambios realizados.
+- Los recursos de TC arterial de `assets/celiac/ct/` proceden de CPTAC-PDA y los de microTC de `assets/ear/reference/` proceden de Wimmer et al.; ambos conservan CC BY 4.0 con atribución separada.
 - Las dependencias de terceros conservan sus propias licencias.
 
 ## Construir y publicar
@@ -74,7 +105,7 @@ npm ci
 npm run build
 ```
 
-La compilación crea `site/index.html` para la RM y `site/oido/index.html` para el oído. Copia los recursos ya preparados, por lo que **no requiere Python ni descargar otra vez los datos médicos**. Cada cambio enviado a la rama `main` ejecuta `.github/workflows/pages.yml`, que reconstruye el sitio y lo publica en GitHub Pages. `site/`, `node_modules/` y `raw/` están excluidos de Git.
+La compilación crea `site/index.html` para la RM celíaca, `site/celiaco/tc/index.html` para la TC arterial y `site/oido/index.html` para las técnicas del oído. Copia los recursos ya preparados, por lo que **no requiere Python ni descargar otra vez los datos médicos**. Cada cambio enviado a la rama `main` ejecuta `.github/workflows/pages.yml`, que reconstruye el sitio y lo publica en GitHub Pages. `site/`, `node_modules/` y `raw/` están excluidos de Git.
 
 Para revisar ambos visores localmente:
 
@@ -82,7 +113,7 @@ Para revisar ambos visores localmente:
 python -m http.server 8765 --bind 127.0.0.1 --directory site
 ```
 
-Abre [la RM local](http://127.0.0.1:8765/) o [el oído local](http://127.0.0.1:8765/oido/). El visor del oído necesita servirse por **HTTP o HTTPS**, porque carga sus datos de imagen mediante `fetch`; no se debe abrir directamente con `file://`.
+Abre [la RM local](http://127.0.0.1:8765/), [la TC local](http://127.0.0.1:8765/celiaco/tc/) o [el oído local](http://127.0.0.1:8765/oido/). Los volúmenes de TC y oído necesitan servirse por **HTTP o HTTPS**, porque cargan sus datos de imagen mediante `fetch`; no se deben abrir directamente con `file://`.
 
 ## Control mediante un asistente (WebMCP)
 
@@ -114,16 +145,28 @@ Implementación original inspirada en el patrón de registro del [ejemplo de Run
 
 `npm run check` ejecuta pruebas de validación, registro, compatibilidad y limpieza, y comprueba el sitio construido. Para una prueba completa se necesita además abrir la página en un asistente compatible, llamar a las herramientas y comprobar los cambios visibles.
 
-### Herramientas del oído
+### Herramientas de los volúmenes: RM del oído, microTC y TC arterial
+
+Las herramientas conservan los mismos cuatro sufijos y emplean un prefijo que identifica el conjunto cargado:
+
+| Conjunto | Prefijo | Representaciones disponibles |
+| --- | --- | --- |
+| RM CISS del oído | `mri_oido` | `slices`, `mip` |
+| MicroTC F01 del oído | `microct_oido` | `slices`, `mip`, `surface`, `combined` |
+| TC arterial celíaca | `ct_celiaco` | `slices`, `mip` |
+
+Por ejemplo, en TC se registra `ct_celiaco_obtener_contexto` y en F01 `microct_oido_ajustar_cortes`. La tabla siguiente muestra los nombres que se mantienen para la RM del oído:
 
 | Herramienta | Función |
 | --- | --- |
-| `mri_oido_obtener_contexto` | Lee fuente, resolución, referencias y estado del visor; no devuelve imágenes en base64. |
-| `mri_oido_ajustar_cortes` | Ajusta corte seleccionado, radio de vecinos, opacidad, separación, zoom 2D, orientación, referencias y filtro de intensidad (`intensity_filter`, `threshold` de 0 a 245). |
+| `mri_oido_obtener_contexto` | Lee fuente, modalidad real, resolución, referencias, condición ex vivo, superficie disponible y estado del visor; no devuelve imágenes en base64. |
+| `mri_oido_ajustar_cortes` | Ajusta corte seleccionado, radio de vecinos, opacidad, separación, zoom 2D, orientación, representación (`representation`), referencias y filtro de intensidad (`intensity_filter`, `threshold` de 0 a 245). |
 | `mri_oido_enfocar_referencia` | Selecciona el corte de una referencia disponible y lo muestra de frente con radio de vecinos cero. |
 | `mri_oido_restaurar_vista` | Restablece corte inicial, radio de diez vecinos, opacidad del 72 %, separación 1,0× y vista oblicua. |
 
-Los números de corte son **1–41** dentro del recurso publicado y corresponden a **11–51** en los DICOM originales. La opacidad admite **5–100 %**, la separación visual **1–3** en incrementos de **0,1**, y `zoom_2d` admite **1–6** en incrementos de **0,25**. Las referencias usan los identificadores `cochlea` y `tumor` que entrega la herramienta de contexto. Los parámetros se validan antes de modificar la imagen. Por ejemplo: «Muestra solamente el corte 20 de frente» o «Consulta la procedencia y resolución de esta resonancia».
+En la RM, los números de corte son **1–41** dentro del recurso publicado y corresponden a **11–51** en los DICOM originales; las referencias usan `cochlea` y `tumor`. En TC y microTC, los límites y referencias se consultan en el contexto de su propio conjunto. La TC no incluye referencias arteriales individuales para enfocar.
+
+La opacidad admite **5–100 %** y `zoom_2d` admite **1–6** en incrementos de **0,25**. La separación visual **1–3**, en incrementos de **0,1**, está disponible en la representación `slices`; las representaciones MIP, superficie y combinada mantienen **1,0×**. Los parámetros se validan antes de modificar la imagen. Por ejemplo: «Muestra solamente el corte 20 de frente», «Cambia a MIP» o «Consulta la procedencia y resolución de este estudio». La representación de superficie corresponde a la segmentación original F01 y no está disponible para los otros conjuntos.
 
 ## Regenerar los planos desde los DICOM públicos
 
@@ -154,17 +197,33 @@ El script decodifica las imágenes DICOM mediante `pydicom` y utiliza `openslide
 
 Además genera `Oido_RM_CISS_VS-SEG-023_corte_coclea.tiff`, un corte 2D real recortado que puede abrirse por separado con OpenSlide o un visor compatible. El TIFF utiliza bloques de 128 × 128 y sus píxeles se verifican tras volver a leerlo con `openslide.OpenSlide`. Se identifica como RM y no como una lámina microscópica; no se le atribuyen aumento óptico ni resolución microscópica. `tifffile` se requiere para escribir este archivo adicional, pero el navegador carga el volumen preparado directamente.
 
+### Regenerar microTC y TC arterial
+
+Las mismas dependencias de `requirements-ear.txt` cubren estos scripts; no se necesitan para compilar la web. Para F01 descarga [el ZIP original de Zenodo](https://zenodo.org/records/3355272/files/F01.zip?download=1) y conserva su nombre. El script verifica el MD5 publicado y los CRC, lee NIfTI, conserva la máscara y convierte la superficie original a GLB.
+
+```bash
+python scripts/prepare-ear-reference.py --source /ruta/F01.zip --output assets/ear/reference
+python scripts/prepare-celiac-ct.py --download --source /ruta/TC-ART-THINS --output assets/celiac/ct
+npm run build
+```
+
+Para la TC, `--download` obtiene la serie pública de IDC cuando faltan sus archivos. `pydicom` decodifica los DICOM y convierte su intensidad a HU; OpenSlide lee los recortes de los planos ya decodificados y ajustados a la ventana. Los scripts guardan procedencia y hashes junto con los recursos preparados. El script de microTC no necesita OpenSlide para leer sus archivos NIfTI.
+
 ## Estructura
 
 - `src/viewer.js`: escena 3D e interacción con Three.js.
 - `src/webmcp.js`: herramientas para asistentes, validación y ciclo de registro.
 - `src/template.html`: interfaz del visor.
 - `data/study_data.json`: recortes y referencias anatómicas.
-- `src/ear-mri-viewer.js`, `src/ear-mri-template.html`, `src/ear-mri.css`: interfaz, escena y controles de la RM del oído.
+- `src/ear-mri-viewer.js`, `src/ear-mri-template.html`, `src/ear-mri.css`: interfaz, escena y controles compartidos por los volúmenes de RM del oído, microTC y TC arterial.
 - `assets/RM_tronco_celiaco_*.png`: figuras derivadas de RM para consulta.
 - `assets/ear/mri/`: recursos y metadatos preparados de la RM del oído.
+- `assets/ear/reference/`: microTC, máscara, superficie y referencias originales de F01.
+- `assets/celiac/ct/`: TC arterial, metadatos y vistas de consulta de C3L-02112.
 - `scripts/build.mjs`: compilación reproducible del sitio.
 - `scripts/prepare_data.py`: preparación opcional desde DICOM.
 - `scripts/prepare-ear-mri.py`: preparación opcional de la serie CISS y sus recortes.
+- `scripts/prepare-ear-reference.py`: preparación opcional de los recursos originales F01.
+- `scripts/prepare-celiac-ct.py`: descarga y preparación opcional de la TC arterial.
 
 El visor no sube imágenes ni incorpora servicios de IA de pago. Al utilizar WebMCP, el asistente que invoque sus herramientas recibe los metadatos públicos del estudio y el estado del visor; su tratamiento depende de ese asistente. Las visitas al sitio están sujetas a las prácticas de GitHub Pages; el enlace externo a IDC abre ese servicio por separado.

@@ -1,4 +1,5 @@
-# Optional dependencies for regenerating prepared DICOM MRI assets; the web build uses Node.js only.
+# Optional dependencies for regenerating MRI, microCT F01 and arterial CT assets.
+# The web build uses prepared assets and Node.js only.
 numpy>=2,<3
 Pillow>=11,<13
 pydicom>=3,<4

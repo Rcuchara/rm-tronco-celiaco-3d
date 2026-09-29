@@ -1,9 +1,24 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { axisName, directionVectors, fitBoxDistance, flipSliceRows, slicePixels, voxelToWorld, worldToVoxel } from './ear-math.js';
 import { installViewerTools } from './webmcp.js';
 
 const $ = id => document.getElementById(id);
+const config = JSON.parse($('viewer-config').textContent);
+let technique = config.datasets.find(item => item.id === new URL(location.href).searchParams.get('tecnica') && item.manifest) || config.datasets.find(item => item.id === config.defaultDataset);
+for (const item of config.datasets) {
+  const option = document.createElement('option'); option.value = item.id; option.textContent = item.label; $('dataset-select').append(option);
+}
+$('dataset-select').value = technique.id;
+$(config.anatomy === 'ear' ? 'nav-ear' : 'nav-celiac').setAttribute('aria-current', 'page');
+const modalityLabel = () => manifest?.modality === 'MR' ? 'RM' : technique.modalityLabel || 'TC';
+const specimenCoordinates = () => volume?.coordinateSystem === 'specimen' || volume?.coordinate_system === 'specimen';
+function orientationName(vector) {
+  if (!specimenCoordinates()) return axisName(vector);
+  const axis = vector.map(Math.abs).indexOf(Math.max(...vector.map(Math.abs)));
+  return `${vector[axis] >= 0 ? '+' : '−'}${['X','Y','Z'][axis]}`;
+}
 const stage = $('stage');
 const scene = new THREE.Scene(); scene.background = new THREE.Color('#08151e');
 const camera = new THREE.PerspectiveCamera(42, 1, 0.01, 5000); camera.up.set(0, 0, 1);
@@ -14,6 +29,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 stage.prepend(renderer.domElement);
 const group = new THREE.Group(); scene.add(group);
+scene.add(new THREE.HemisphereLight(0xecf8ff, 0x26343c, 2));
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.4); keyLight.position.set(1, -2, 3); scene.add(keyLight);
 let controls;
 let manifest, volume, voxels, aborter, registration, ready = false;
 let selected = 0, initialSlice = 0, activeView = 'oblique';
@@ -21,6 +38,7 @@ let previewZoom = 1;
 let center = new THREE.Vector3(), bounds = new THREE.Box3(), priorBoundsCenter;
 let slices = new Map(), references = [], referenceObjects = [], contours = [];
 let frame;
+let surfaceRoot = null, surfaceBounds = null, mipRecord = null, mipKey = '';
 
 function installControls() {
   controls?.dispose();
@@ -44,6 +62,7 @@ function status(text, progress) {
 function inputsEnabled(enabled) {
   document.querySelectorAll('main button, main input, main select').forEach(element => { element.disabled = !enabled; });
   $('retry-load').disabled = false;
+  $('dataset-select').disabled = false;
 }
 function dispose() {
   group.traverse(object => {
@@ -52,10 +71,11 @@ function dispose() {
   });
   group.clear(); slices.clear(); referenceObjects = []; references = []; contours = [];
   $('label-layer').replaceChildren(); voxels = null; frame = null; priorBoundsCenter = null;
+  surfaceRoot = null; surfaceBounds = null; mipRecord = null; mipKey = ''; $('representation-section').hidden = true;
 }
 function normalizeVolume(data) {
   const source = data.volume;
-  if (!source) throw new Error('El manifiesto no contiene un volumen de resonancia.');
+  if (!source) throw new Error('El manifiesto no contiene un volumen de imagen.');
   const result = { ...source, origin: source.origin || source.originRAS || source.origin_ras_mm };
   for (const key of ['dimensions', 'spacing', 'origin']) if (!Array.isArray(result[key]) || result[key].length !== 3 || !result[key].every(Number.isFinite)) throw new Error(`Geometría incompleta: ${key}.`);
   if (!result.dimensions.every(n => Number.isInteger(n) && n > 0) || !result.spacing.every(n => n > 0)) throw new Error('Dimensiones o espaciado inválidos.');
@@ -92,12 +112,28 @@ async function loadContours(base, signal) {
   for (const roi of data) for (const path of roi.paths || []) {
     if (path.geometry !== 'CLOSED_PLANAR' || !Number.isInteger(path.sliceIndex) || path.sliceIndex < 0 || path.sliceIndex >= volume.dimensions[2] || !Array.isArray(path.points) || path.points.length < 3 || path.points.some(point => !Array.isArray(point) || point.length !== 3 || !point.every(Number.isFinite))) throw new Error('Un contorno original tiene geometría inválida.');
     const points = path.points.map(point => worldToVoxel(volume, point));
-    if (points.some(point => Math.abs(point[2] - path.sliceIndex) > 0.01)) throw new Error('Un contorno no coincide con su corte de resonancia.');
+    if (points.some(point => Math.abs(point[2] - path.sliceIndex) > 0.01)) throw new Error('Un contorno no coincide con su corte de imagen.');
     const color = roi.color || '#7be0d1';
     const line = new THREE.LineLoop(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.95, depthTest: false }));
     line.renderOrder = 1000; group.add(line);
     contours.push({ id: roi.id, color, slice: path.sliceIndex, points, line });
   }
+}
+async function loadSurface(base, signal) {
+  if (!manifest.surface?.file) return;
+  if (!manifest.surface.registeredToVolume || JSON.stringify(manifest.surface.transform?.flat()) !== JSON.stringify([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1])) throw new Error('La superficie requiere un registro físico verificado con estas imágenes.');
+  const url = new URL(manifest.surface.file, base);
+  if (url.origin !== base.origin) throw new Error('Ruta de superficie no válida.');
+  const response = await fetch(url, { signal });
+  if (!response.ok) throw new Error('No se pudo cargar la superficie segmentada.');
+  const bytes = await response.arrayBuffer();
+  const gltf = await new GLTFLoader().parseAsync(bytes, base.href);
+  if (signal.aborted) { gltf.scene.traverse(object => { object.geometry?.dispose(); for (const material of [object.material].flat().filter(Boolean)) material.dispose(); }); return; }
+  surfaceRoot = gltf.scene;
+  surfaceRoot.position.sub(center);
+  surfaceRoot.traverse(object => { if (object.isMesh) { for (const material of [object.material].flat()) material?.dispose(); object.material = new THREE.MeshStandardMaterial({ color: '#91ddd4', roughness: 0.68, metalness: 0, side: THREE.DoubleSide }); } });
+  group.add(surfaceRoot); surfaceRoot.updateMatrixWorld(true);
+  surfaceBounds = new THREE.Box3().setFromObject(surfaceRoot);
 }
 function originalSliceNumber(index = selected) {
   const mapping = manifest?.sourceOriginalSliceNumbers || manifest?.source_original_slice_numbers || volume?.sourceOriginalSliceNumbers || volume?.source_original_slice_numbers;
@@ -105,17 +141,21 @@ function originalSliceNumber(index = selected) {
 }
 function sourceDetails() {
   const source = manifest.source || {};
-  $('dataset-subtitle').textContent = manifest.subtitle || manifest.title || 'Cortes de resonancia magnética apilados';
-  $('dataset-summary').textContent = manifest.summary || manifest.description || 'Volumen de resonancia magnética; los planos 3D proceden de sus cortes.';
-  $('dataset-select').options[0].textContent = manifest.title || 'Resonancia del oído';
+  $('viewer-title').textContent = `${config.title} · ${modalityLabel()} en 3D`;
+  document.title = `${config.title} · ${modalityLabel()} en 3D`;
+  $('dataset-subtitle').textContent = manifest.subtitle || manifest.title || 'Cortes reales apilados';
+  $('dataset-context').textContent = technique.context;
+  $('orientation-canvas').setAttribute('aria-label', specimenCoordinates() ? 'Ejes X, Y, Z del espécimen' : 'Brújula de orientación: derecha, anterior y superior');
+  $('reference-note').textContent = manifest.contours ? 'Los trazos siguen los contornos originales publicados; los puntos indican el centro de cada región. Se muestran cuando sus cortes están visibles.' : manifest.exVivo ? 'Referencias de la fuente en las coordenadas de la pieza anatómica. No están registradas con el paciente de RM.' : 'No se han añadido contornos ni etiquetas anatómicas sin una segmentación de la fuente.';
+  $('dataset-summary').textContent = manifest.summary || manifest.description || 'Volumen médico; los planos 3D proceden de sus cortes.';
   const sequence = typeof manifest.sequence === 'string' ? manifest.sequence : typeof source.sequence === 'string' ? source.sequence : '';
-  $('modality-badge').textContent = `RM${sequence ? ` · ${sequence}` : ''} · ${volume.dimensions[2]} cortes`;
+  $('modality-badge').textContent = `${modalityLabel()} · ${volume.dimensions[2]} cortes`;
   $('dataset-resolution').textContent = `${volume.dimensions.join(' × ')} vóxeles · ${volume.spacing.map(n => n.toLocaleString('es', { maximumFractionDigits: 4 })).join(' × ')} mm`;
   const container = $('source-details'); container.replaceChildren();
   const paragraph = text => { if (!text) return; const p = document.createElement('p'); p.textContent = text; container.append(p); };
   paragraph(source.citation || manifest.citation || manifest.title);
   if (source.url) { const url = new URL(source.url); if (url.protocol === 'https:') { const a = document.createElement('a'); a.href = url.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'Consultar datos originales'; container.append(a); } }
-  paragraph(`Modalidad: resonancia magnética${sequence ? ` (${sequence})` : ''}. Licencia: ${source.license || manifest.license || 'consultar la fuente'}.`);
+  paragraph(`Modalidad: ${modalityLabel()}${sequence ? ` (${sequence})` : ''}. Licencia: ${source.license || manifest.license || 'consultar la fuente'}.`);
   for (const text of [manifest.limitations, manifest.orientation_note, volume.processing].flat(2).filter(Boolean)) paragraph(typeof text === 'string' ? text : JSON.stringify(text));
   if (manifest.processing) {
     paragraph(manifest.processing.geometry);
@@ -173,7 +213,7 @@ function updateReferences() {
   }
   for (const object of referenceObjects) {
     object.marker.position.copy(localPoint(object.ref.ijk));
-    object.marker.visible = $('references-toggle').checked && object.ref.slice >= first && object.ref.slice <= last;
+    object.marker.visible = $('references-toggle').checked && (surfaceRoot?.visible || object.ref.slice >= first && object.ref.slice <= last);
     object.label.style.display = object.marker.visible ? '' : 'none';
   }
 }
@@ -202,10 +242,10 @@ function updatePreview() {
   const fontSize = Math.max(4, width / 26);
   ctx.font = `600 ${fontSize}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   for (const [text, x, y] of [
-    [axisName(volume.directions[0].map(n => -n)), fontSize, height / 2],
-    [axisName(volume.directions[0]), width - fontSize, height / 2],
-    [axisName(volume.directions[1]), width / 2, fontSize],
-    [axisName(volume.directions[1].map(n => -n)), width / 2, height - fontSize],
+    [orientationName(volume.directions[0].map(n => -n)), fontSize, height / 2],
+    [orientationName(volume.directions[0]), width - fontSize, height / 2],
+    [orientationName(volume.directions[1]), width / 2, fontSize],
+    [orientationName(volume.directions[1].map(n => -n)), width / 2, height - fontSize],
   ]) {
     ctx.fillStyle = '#03111ccc'; ctx.fillRect(x - fontSize * .65, y - fontSize * .7, fontSize * 1.3, fontSize * 1.4);
     ctx.fillStyle = '#a9fff0'; ctx.fillText(text, x, y);
@@ -250,13 +290,17 @@ function setPreviewZoom(value) {
 }
 function updateStack({ follow = true } = {}) {
   if (!voxels) return;
+  const mode = $('representation-select').value;
+  const showSlices = mode === 'slices' || mode === 'combined';
+  $('spacing-range').disabled = mode !== 'slices';
+  if (mode !== 'slices') $('spacing-range').value = 1;
   selected = +$('slice-range').value - 1;
   const [first, last] = visibleInterval();
-  for (const [index, record] of slices) if (index < first || index > last) {
+  for (const [index, record] of slices) if (!showSlices || index < first || index > last) {
     group.remove(record.mesh); record.mesh.geometry.dispose(); record.texture.dispose(); record.mesh.material.dispose(); slices.delete(index);
   }
   bounds.makeEmpty();
-  for (let index = first; index <= last; index++) {
+  for (let index = first; showSlices && index <= last; index++) {
     if (!slices.has(index)) slices.set(index, createSlice(index));
     const record = slices.get(index), corners = planeCorners(index), position = record.mesh.geometry.attributes.position;
     corners.forEach((point, i) => { position.setXYZ(i, point.x, point.y, point.z); bounds.expandByPoint(point); });
@@ -265,13 +309,39 @@ function updateStack({ follow = true } = {}) {
     record.mesh.material.opacity = opacity * (index === selected ? 1 : $('intensity-toggle').checked ? 0.65 : 0.18);
     updateTexture(record);
   }
+  if (surfaceRoot) {
+    surfaceRoot.visible = mode === 'surface' || mode === 'combined';
+    if (surfaceRoot.visible) bounds.union(surfaceBounds);
+    surfaceRoot.traverse(object => { if (object.isMesh) { object.material.opacity = mode === 'surface' ? +$('opacity-range').value / 100 : 1; object.material.transparent = object.material.opacity < 1; object.material.depthWrite = !object.material.transparent; } });
+  }
+  if (mipRecord) mipRecord.mesh.visible = mode === 'mip';
+  if (mode === 'mip') {
+    if (!mipRecord) mipRecord = createSlice(selected);
+    mipRecord.mesh.visible = true;
+    const key = `${first}:${last}`;
+    if (key !== mipKey) {
+      const count = volume.dimensions[0] * volume.dimensions[1];
+      for (let pixel = 0; pixel < count; pixel++) {
+        let value = 0;
+        for (let k = first; k <= last; k++) value = Math.max(value, voxels[k * count + pixel]);
+        const p = pixel * 4; mipRecord.pixels[p] = mipRecord.pixels[p + 1] = mipRecord.pixels[p + 2] = value;
+      }
+      mipRecord.threshold = null; mipKey = key;
+    }
+    const position = mipRecord.mesh.geometry.attributes.position;
+    planeCorners(selected).forEach((point, i) => { position.setXYZ(i, point.x, point.y, point.z); bounds.expandByPoint(point); });
+    position.needsUpdate = true; mipRecord.mesh.geometry.computeBoundingSphere(); mipRecord.mesh.material.opacity = +$('opacity-range').value / 100; updateTexture(mipRecord);
+  }
+  $('surface-note').textContent = mode === 'mip' ? `Máximo de intensidad de los cortes ${first + 1}–${last + 1}, proyectado sobre un plano. Muestra señales superpuestas; no es una segmentación de los vasos.` : mode === 'surface' || mode === 'combined' ? 'Laberinto óseo: superficie original de los autores, derivada de la segmentación de estas mismas imágenes micro-TC. En la vista combinada se mantiene la escala física 1×. No incluye nervios ni huesecillos separados.' : 'Cortes reales colocados según la geometría de la adquisición. La imagen 2D permite revisar el corte seleccionado.';
   const nextCenter = bounds.getCenter(new THREE.Vector3());
   if (follow && priorBoundsCenter) { const shift = nextCenter.clone().sub(priorBoundsCenter); controls.target.add(shift); camera.position.add(shift); }
   priorBoundsCenter = nextCenter;
   updateFrame(); updateReferences(); updatePreview();
+  frame.visible = mode !== 'surface';
+  if (mode === 'mip') { for (const item of contours) item.line.visible = false; for (const item of referenceObjects) item.marker.visible = false; }
   $('slice-value').textContent = `${selected + 1} / ${volume.dimensions[2]}${originalSliceNumber() === null ? '' : ` · orig. ${originalSliceNumber()}`}`;
   $('radius-value').textContent = +$('radius-range').value === volume.dimensions[2] - 1 ? 'Todos' : `±${$('radius-range').value}`;
-  $('visible-count').textContent = `${last - first + 1} cortes visibles: ${first + 1} a ${last + 1}.`;
+  $('visible-count').textContent = mode === 'surface' ? 'Superficie completa; el control de posición recorre los cortes en la imagen 2D.' : `${last - first + 1} cortes ${mode === 'mip' ? 'proyectados' : 'visibles'}: ${first + 1} a ${last + 1}.`;
   $('opacity-value').textContent = `${$('opacity-range').value} %`;
   $('spacing-value').textContent = `${(+$('spacing-range').value).toLocaleString('es', { minimumFractionDigits: 1 })}×`;
   $('threshold-value').textContent = `${$('threshold-range').value} / 255`;
@@ -295,29 +365,41 @@ function fitView(view = activeView) {
 }
 function focusReference(id) {
   const ref = references.find(item => item.id === id); if (!ref) throw new Error('Referencia no disponible.');
+  $('representation-select').value = 'slices';
   $('slice-range').value = ref.slice + 1; $('radius-range').value = 0; $('references-toggle').checked = true;
   updateStack(); fitView('axial');
 }
 function resetView() {
   if (!ready) return;
-  $('slice-range').value = initialSlice + 1; $('radius-range').value = Math.min(10, volume.dimensions[2] - 1);
-  $('opacity-range').value = 72; $('spacing-range').value = 1; $('intensity-toggle').checked = false; $('threshold-range').value = 110;
+  $('representation-select').value = technique.defaultRepresentation || 'slices';
+  $('slice-range').value = initialSlice + 1; $('radius-range').value = Math.min(technique.defaultRadius ?? manifest.defaultRadius ?? 10, volume.dimensions[2] - 1);
+  $('opacity-range').value = technique.defaultOpacity ?? 72; $('spacing-range').value = 1; $('intensity-toggle').checked = false; $('threshold-range').value = 110;
   $('references-toggle').checked = references.length > 0;
-  setPreviewZoom(1); updateStack(); fitView('oblique');
+  setPreviewZoom(1); updateStack(); fitView(technique.defaultView || 'oblique');
 }
 
 async function load() {
   aborter?.abort(); const controller = new AbortController(); aborter = controller;
   registration?.dispose(); ready = false; window.earMriReady = false; controls.enabled = false; inputsEnabled(false); dispose();
-  $('load-error').hidden = true; $('load-progress').hidden = false; status('Cargando manifiesto de resonancia…', 0);
+  manifest = null; volume = null;
+  $('viewer-title').textContent = `${config.title} · ${technique.modalityLabel}`;
+  $('dataset-subtitle').textContent = 'Cargando el conjunto seleccionado…'; $('dataset-context').textContent = technique.context;
+  $('dataset-summary').textContent = ''; $('dataset-resolution').textContent = ''; $('source-details').replaceChildren();
+  $('reference-list').replaceChildren(); $('reference-note').textContent = '';
+  $('selected-title').textContent = 'Corte seleccionado · 2D'; $('selected-position').textContent = '';
+  $('slice-value').textContent = '—'; $('visible-count').textContent = 'Preparando los cortes del conjunto seleccionado…';
+  $('assistant-status').textContent = 'Disponible después de cargar este conjunto.'; $('assistant-action').textContent = '';
+  $('modality-badge').textContent = technique.modalityLabel;
+  $('selected-canvas').getContext('2d').clearRect(0, 0, $('selected-canvas').width, $('selected-canvas').height);
+  $('load-error').hidden = true; $('load-progress').hidden = false; status('Cargando la información de las imágenes…', 0);
   try {
-    const base = new URL('./data/mri/', location.href);
-    const response = await fetch(new URL('manifest.json', base), { signal: controller.signal });
+    const manifestUrl = new URL(technique.manifest, location.href), base = new URL('./', manifestUrl);
+    const response = await fetch(manifestUrl, { signal: controller.signal });
     if (!response.ok) throw new Error(`No se pudo cargar el manifiesto (${response.status}).`);
     const data = await response.json(); if (controller.signal.aborted) return;
-    if (!['MR', 'MRI', 'RM'].includes(String(data.modality || data.volume?.modality || '').toUpperCase())) throw new Error('El conjunto no está identificado como resonancia magnética. No se cargarán datos de otra modalidad.');
+    if (data.modality !== technique.modality) throw new Error('La modalidad de las imágenes no coincide con la técnica seleccionada.');
     manifest = data; volume = normalizeVolume(data); sourceDetails();
-    status('Descargando los cortes de resonancia…', 15);
+    status(`Descargando los cortes de ${modalityLabel()}…`, 15);
     const file = volume.file || volume.url;
     if (typeof file !== 'string' || !file || new URL(file, base).origin !== base.origin) throw new Error('La ruta del volumen no es válida.');
     const image = await fetch(new URL(file, base), { signal: controller.signal });
@@ -336,29 +418,34 @@ async function load() {
     camera.up.set(...volume.directions[2]); installControls();
     normalizeReferences(); await loadContours(base, controller.signal);
     if (controller.signal.aborted) return;
+    await loadSurface(base, controller.signal);
+    if (controller.signal.aborted) return;
+    for (const option of $('representation-select').options) { option.hidden = option.disabled = ['surface','combined'].includes(option.value) && !surfaceRoot; }
+    $('representation-section').hidden = false;
     buildReferences();
     const candidate = manifest.defaultSlice ?? manifest.initial_slice_index ?? manifest.initial_slice ?? references[0]?.slice ?? Math.floor(volume.dimensions[2] / 2);
     initialSlice = Number.isInteger(candidate) ? Math.max(0, Math.min(volume.dimensions[2] - 1, candidate)) : Math.floor(volume.dimensions[2] / 2);
     $('slice-range').max = volume.dimensions[2]; $('radius-range').max = volume.dimensions[2] - 1;
     ready = true; inputsEnabled(true); $('references-toggle').disabled = references.length === 0; resetView();
-    status(`${manifest.title || 'Resonancia'} · cortes listos`, 100); $('load-progress').hidden = true;
+    status(`${manifest.title || 'Imágenes'} · listo`, 100); $('load-progress').hidden = true;
     registerTools(); window.earMriReady = true;
   } catch (error) {
     if (controller.signal.aborted) return;
     ready = false; window.earMriReady = false;
     $('load-error').hidden = false; $('load-error-message').textContent = error.message;
-    $('retry-load').disabled = false; status('La resonancia no se ha cargado. Puedes reintentar.', 0);
-    console.error('Visor de RM del oído:', error);
+    inputsEnabled(false); $('load-progress').hidden = true; status('Las imágenes no se han cargado. Puedes reintentar o elegir otra técnica.', 0);
+    console.error('Visor de imágenes médicas:', error);
   }
 }
 function getState() {
   const [first, last] = ready ? visibleInterval() : [0, -1];
-  return { dataset: manifest?.id || 'mri', modality: 'MR', ready, slice: selected + 1, source_slice_number: originalSliceNumber(), slice_count: volume?.dimensions[2], visible_slices: Array.from({ length: Math.max(0, last - first + 1) }, (_, i) => first + i + 1), radius: +$('radius-range').value, opacity_percent: +$('opacity-range').value, visual_spacing: +$('spacing-range').value, zoom_2d: previewZoom, view: activeView, references_visible: $('references-toggle').checked, intensity_filter: { enabled: $('intensity-toggle').checked, threshold: +$('threshold-range').value } };
+  return { dataset: manifest?.id || technique.id, modality: manifest?.modality || technique.modality, representation: $('representation-select').value, ex_vivo: !!manifest?.exVivo, ready, slice: selected + 1, source_slice_number: originalSliceNumber(), slice_count: volume?.dimensions[2], visible_slices: Array.from({ length: Math.max(0, last - first + 1) }, (_, i) => first + i + 1), radius: +$('radius-range').value, opacity_percent: +$('opacity-range').value, visual_spacing: +$('spacing-range').value, zoom_2d: previewZoom, view: activeView, references_visible: $('references-toggle').checked, intensity_filter: { enabled: $('intensity-toggle').checked, threshold: +$('threshold-range').value } };
 }
 function registerTools() {
+  const prefix = config.anatomy === 'celiac' ? 'ct_celiaco' : manifest.modality === 'MR' ? 'mri_oido' : 'microct_oido';
   const schema = properties => ({ type: 'object', properties, additionalProperties: false });
   const make = (name, description, properties, action, readOnlyHint = false) => ({ name, description, inputSchema: schema(properties), annotations: { readOnlyHint, untrustedContentHint: true }, execute: async input => {
-    if (!ready) throw new Error('La resonancia todavía no está lista.');
+    if (!ready) throw new Error('Las imágenes todavía no están listas.');
     if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(key => !Object.hasOwn(properties, key))) throw new Error('Parámetros no válidos.');
     for (const [key, value] of Object.entries(input)) {
       const rule = properties[key];
@@ -370,22 +457,32 @@ function registerTools() {
     return JSON.stringify({ ...result, state: getState() });
   } });
   const tools = [
-    make('mri_oido_obtener_contexto', 'Consulta la fuente de la RM, resolución, referencias proporcionadas y estado del apilado de cortes.', {}, () => ({ title: manifest.title, source: manifest.source, sequence: manifest.sequence, limitations: manifest.limitations, volume: { dimensions: volume.dimensions, spacing_mm: volume.spacing, origin: volume.origin, directions: volume.directions }, references: references.map(({ id, name, slice, placement, derivation }) => ({ id, name, slice: slice + 1, source_slice_number: originalSliceNumber(slice), placement, derivation, original_contour_count: contours.filter(contour => contour.id === id).length })) }), true),
-    make('mri_oido_ajustar_cortes', 'Ajusta los cortes reales de resonancia apilados: posición desde 1 en este volumen, vecinos, opacidad, separación visual, zoom2D y filtro de intensidad 3D. La posición no es necesariamente el número original DICOM.', { slice: { type: 'integer', minimum: 1, maximum: volume.dimensions[2] }, radius: { type: 'integer', minimum: 0, maximum: volume.dimensions[2] - 1 }, opacity: { type: 'integer', minimum: 5, maximum: 100 }, spacing: { type: 'number', minimum: 1, maximum: 3, multipleOf: 0.1 }, zoom_2d: { type: 'number', minimum: 1, maximum: 6, multipleOf: 0.25 }, view: { type: 'string', enum: ['oblique', 'axial', 'lateral'] }, references: { type: 'boolean' }, intensity_filter: { type: 'boolean' }, threshold: { type: 'integer', minimum: 0, maximum: 245 } }, input => {
+    make(`${prefix}_obtener_contexto`, 'Consulta la fuente, modalidad, resolución, referencias proporcionadas y estado del apilado de cortes.', {}, () => ({ title: manifest.title, source: manifest.source, sequence: manifest.sequence, surface: manifest.surface || null, limitations: manifest.limitations, volume: { dimensions: volume.dimensions, spacing_mm: volume.spacing, origin: volume.origin, directions: volume.directions }, references: references.map(({ id, name, slice, placement, derivation }) => ({ id, name, slice: slice + 1, source_slice_number: originalSliceNumber(slice), placement, derivation, original_contour_count: contours.filter(contour => contour.id === id).length })) }), true),
+    make(`${prefix}_ajustar_cortes`, 'Ajusta los cortes reales apilados: posición desde 1 en este volumen, vecinos, opacidad, separación visual, zoom2D y filtro de intensidad 3D. La posición no es necesariamente el número original DICOM.', { representation: { type: 'string', enum: surfaceRoot ? ['slices','mip','surface','combined'] : ['slices','mip'] }, slice: { type: 'integer', minimum: 1, maximum: volume.dimensions[2] }, radius: { type: 'integer', minimum: 0, maximum: volume.dimensions[2] - 1 }, opacity: { type: 'integer', minimum: 5, maximum: 100 }, spacing: { type: 'number', minimum: 1, maximum: 3, multipleOf: 0.1 }, zoom_2d: { type: 'number', minimum: 1, maximum: 6, multipleOf: 0.25 }, view: { type: 'string', enum: ['oblique', 'axial', 'lateral'] }, references: { type: 'boolean' }, intensity_filter: { type: 'boolean' }, threshold: { type: 'integer', minimum: 0, maximum: 245 } }, input => {
       if (!Object.keys(input).length) throw new Error('Indica al menos un ajuste.');
       for (const [key, id] of [['slice', 'slice-range'], ['radius', 'radius-range'], ['opacity', 'opacity-range'], ['spacing', 'spacing-range']]) if (input[key] !== undefined) $(id).value = input[key];
       if (input.references !== undefined) $('references-toggle').checked = input.references && references.length > 0;
       if (input.intensity_filter !== undefined) $('intensity-toggle').checked = input.intensity_filter;
       if (input.threshold !== undefined) $('threshold-range').value = input.threshold;
       if (input.zoom_2d !== undefined) setPreviewZoom(input.zoom_2d);
-      updateStack(); if (input.view || input.radius !== undefined || input.spacing !== undefined) fitView(input.view || activeView);
+      if (input.representation) $('representation-select').value = input.representation;
+      updateStack(); if (input.representation || input.view || input.radius !== undefined || input.spacing !== undefined) fitView(input.view || activeView);
     }),
-    make('mri_oido_enfocar_referencia', 'Muestra el corte de una referencia proporcionada para esta resonancia; no detecta ni segmenta anatomía.', { reference: { type: 'string', ...(references.length ? { enum: references.map(ref => ref.id) } : {}) } }, ({ reference }) => { if (!reference) throw new Error('Indica una referencia disponible.'); focusReference(reference); }),
-    make('mri_oido_restaurar_vista', 'Restablece el apilado inicial de cortes de resonancia magnética.', {}, () => resetView()),
+    make(`${prefix}_enfocar_referencia`, 'Muestra el corte de una referencia proporcionada para estas imágenes; no detecta ni segmenta anatomía.', { reference: { type: 'string', ...(references.length ? { enum: references.map(ref => ref.id) } : {}) } }, ({ reference }) => { if (!reference) throw new Error('Indica una referencia disponible.'); focusReference(reference); }),
+    make(`${prefix}_restaurar_vista`, 'Restablece el apilado inicial de cortes de imagen.', {}, () => resetView()),
   ];
   registration = installViewerTools({ tools, onStatus: value => { $('assistant-status').textContent = { ready: 'WebMCP disponible para un asistente compatible.', unavailable: 'Este navegador no ofrece WebMCP. Todos los controles manuales están disponibles.', connecting: 'Comprobando compatibilidad…', error: 'No se pudo activar WebMCP. Puedes seguir usando los controles manuales.' }[value]; } });
 }
 
+$('dataset-select').addEventListener('change', () => {
+  const item = config.datasets.find(entry => entry.id === $('dataset-select').value);
+  if (item.href) { location.assign(item.href); return; }
+  technique = item;
+  const url = new URL(location.href);
+  if (item.id === config.defaultDataset) url.searchParams.delete('tecnica'); else url.searchParams.set('tecnica', item.id);
+  history.replaceState(null, '', url); load();
+});
+$('representation-select').addEventListener('change', () => { if (!ready) return; updateStack({ follow: false }); fitView(); });
 $('slice-range').addEventListener('input', () => updateStack());
 for (const id of ['radius-range', 'spacing-range']) $(id).addEventListener('input', () => { updateStack(); fitView(); });
 for (const id of ['opacity-range', 'references-toggle', 'intensity-toggle', 'threshold-range']) $(id).addEventListener('input', () => updateStack());
@@ -414,8 +511,8 @@ $('save-image').addEventListener('click', () => {
     ctx.fillStyle = '#07131de6'; ctx.fillRect(x, y, object.label.offsetWidth, object.label.offsetHeight); ctx.fillStyle = '#e8ffff'; ctx.fillText(object.ref.name, x + 7, y + 16);
   }
   ctx.fillStyle = '#07131de6'; ctx.fillRect(6, stage.clientHeight - 42, stage.clientWidth - 12, 36); ctx.fillStyle = '#d6eef0';
-  ctx.fillText(`RM · corte ${selected + 1} · separación ${$('spacing-range').value}× · ${manifest.source?.license || 'fuente en el visor'}`, 14, stage.clientHeight - 19); ctx.restore();
-  canvas.toBlob(blob => { if (!blob) return; const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = `oido-RM-corte-${selected + 1}.png`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); });
+  ctx.fillText(`${config.title} · ${modalityLabel()} · ${$('representation-select').selectedOptions[0].text} · corte ${selected + 1} · separación ${$('spacing-range').value}× · ${manifest.source?.license || 'fuente en el visor'}`, 14, stage.clientHeight - 19); ctx.restore();
+  canvas.toBlob(blob => { if (!blob) return; const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url; link.download = `imagen-${config.anatomy}-${technique.id}-${selected + 1}.png`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); });
 });
 
 let priorAspect;
@@ -431,7 +528,7 @@ function drawOrientation() {
   const canvas = $('orientation-canvas'), ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, 100, 100);
   if (!ready) return;
   const rotation = camera.quaternion.clone().invert();
-  const axes = [[new THREE.Vector3(1, 0, 0), 'R', '#ffb5b4'], [new THREE.Vector3(0, 1, 0), 'A', '#89e7d7'], [new THREE.Vector3(0, 0, 1), 'S', '#a5caff']].map(([vector, name, color]) => ({ vector: vector.applyQuaternion(rotation), name, color })).sort((a, b) => a.vector.z - b.vector.z);
+  const axes = [[new THREE.Vector3(1, 0, 0), 'R', '#ffb5b4'], [new THREE.Vector3(0, 1, 0), 'A', '#89e7d7'], [new THREE.Vector3(0, 0, 1), 'S', '#a5caff']].map(([vector, name, color]) => ({ vector: vector.applyQuaternion(rotation), name: specimenCoordinates() ? ({R:'+X',A:'+Y',S:'+Z'})[name] : name, color })).sort((a, b) => a.vector.z - b.vector.z);
   ctx.font = '600 13px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   for (const { vector, name, color } of axes) {
     const x = 50 + vector.x * 29, y = 49 - vector.y * 29;

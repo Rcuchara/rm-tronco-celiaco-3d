@@ -4,21 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07111a">
-  <title>Oído · cortes de resonancia magnética en 3D</title>
+  <title>__PAGE_TITLE__ · imágenes médicas en 3D</title>
   <style>__EAR_MRI_CSS__</style>
 </head>
 <body>
   <a class="skip-link" href="#viewer-shell">Ir al visor</a>
   <header class="app-header">
     <div>
-      <nav aria-label="Visores"><a href="../">Tronco celíaco · RM</a><a href="./" aria-current="page">Oído · RM</a></nav>
-      <h1>Oído · RM en 3D</h1>
-      <p id="dataset-subtitle">Cortes de resonancia magnética apilados en su posición espacial.</p>
+      <nav aria-label="Visores"><a id="nav-celiac" href="__CELIAC_URL__">Tronco celíaco</a><a id="nav-ear" href="__EAR_URL__">Oído</a></nav>
+      <h1 id="viewer-title">__PAGE_TITLE__ · imágenes en 3D</h1>
+      <p id="dataset-subtitle">Elige la técnica de imagen para esta región anatómica.</p>
     </div>
-    <span id="modality-badge" class="badge">RM · preparando datos</span>
+    <span id="modality-badge" class="badge">Preparando datos</span>
   </header>
   <main>
-    <section class="viewer-card" id="viewer-shell" tabindex="-1" aria-label="Cortes de resonancia magnética apilados en tres dimensiones">
+    <section class="viewer-card" id="viewer-shell" tabindex="-1" aria-label="Imágenes médicas en tres dimensiones">
       <div class="toolbar">
         <div class="buttons" role="group" aria-label="Orientación del apilado">
           <button type="button" data-view="oblique" class="active" aria-pressed="true">Oblicua</button>
@@ -32,7 +32,7 @@
         <canvas id="orientation-canvas" width="100" height="100" role="img" aria-label="Brújula de orientación: derecha, anterior y superior"></canvas>
         <p class="gesture">Arrastra para girar · rueda para acercar</p>
         <div id="load-error" class="load-error" hidden role="alert">
-          <h2>No se pudo cargar la resonancia</h2>
+          <h2>No se pudieron cargar las imágenes</h2>
           <p id="load-error-message"></p>
           <button type="button" id="retry-load">Reintentar</button>
         </div>
@@ -41,13 +41,18 @@
       <div class="toolbar bottom-toolbar"><div class="buttons"><button type="button" id="fit-view">Encuadrar cortes</button><button type="button" id="reset-view">Restablecer</button></div><button type="button" id="save-image">Guardar PNG</button></div>
     </section>
 
-    <aside aria-label="Controles de la resonancia">
+    <aside aria-label="Técnica de imagen y controles de visualización">
       <section class="section">
-        <h2>Resonancia seleccionada</h2>
-        <label class="sr-only" for="dataset-select">Conjunto de resonancia magnética</label>
-        <select id="dataset-select"><option value="mri">Resonancia del oído</option></select>
+        <h2><label for="dataset-select">Técnica de imagen</label></h2>
+        <select id="dataset-select"></select>
+        <p id="dataset-context" class="context-note"></p>
         <p id="dataset-summary" class="body-copy">La descripción y la resolución se mostrarán al cargar los datos.</p>
         <p id="dataset-resolution" class="hint"></p>
+      </section>
+      <section class="section" id="representation-section" hidden>
+        <h2><label for="representation-select">Tipo de visualización</label></h2>
+        <select id="representation-select"><option value="slices">Cortes de imagen</option><option value="mip">Proyección de intensidad máxima (MIP)</option><option value="surface">Estructura aislada</option><option value="combined">Estructura y cortes</option></select>
+        <p id="surface-note" class="hint"></p>
       </section>
       <section class="section">
         <h2>Explorar cortes</h2>
@@ -65,7 +70,7 @@
       <section class="section">
         <h2 id="selected-title">Corte seleccionado · 2D</h2>
         <div class="preview-tools" role="group" aria-label="Zoom de la imagen 2D"><button type="button" id="zoom-2d-out" aria-label="Alejar imagen 2D">−</button><output id="zoom-2d-value" aria-live="polite">1×</output><button type="button" id="zoom-2d-in" aria-label="Acercar imagen 2D">+</button><button type="button" id="zoom-2d-reset">Ajustar 2D</button></div>
-        <div id="preview-frame" class="preview-frame"><div id="preview-content"><canvas id="selected-canvas" width="200" height="200" role="img" aria-label="Corte seleccionado de resonancia magnética"></canvas></div></div>
+        <div id="preview-frame" class="preview-frame"><div id="preview-content"><canvas id="selected-canvas" width="200" height="200" role="img" aria-label="Corte seleccionado de la imagen médica"></canvas></div></div>
         <p class="hint">Usa + / − o la rueda para acercar la imagen 2D. Arrastra para recorrerla al ampliar. El zoom no añade resolución.</p>
         <p id="selected-position" class="hint"></p>
         <p class="hint">La imagen 2D conserva la intensidad de los datos preparados y la proporción física del corte.</p>
@@ -74,7 +79,7 @@
         <h2>Referencias</h2>
         <label class="toggle"><input id="references-toggle" type="checkbox" checked><span>Mostrar referencias disponibles</span></label>
         <div id="reference-list" class="reference-list"><p class="hint">Consultando las referencias de la fuente…</p></div>
-        <p class="hint">Los trazos siguen los contornos originales publicados; los puntos indican el centro de cada región. Se muestran cuando sus cortes están visibles.</p>
+        <p id="reference-note" class="hint"></p>
       </section>
       <section class="section">
         <details>
@@ -89,11 +94,12 @@
         <details open><summary>Fuente y resolución</summary><div id="source-details" class="source-details"></div></details>
       </section>
       <section class="section">
-        <details><summary>Control con asistente</summary><p id="assistant-status" role="status" class="hint">Disponible tras cargar la resonancia en un navegador compatible.</p><p id="assistant-action" class="hint" aria-live="polite"></p></details>
+        <details><summary>Control con asistente</summary><p id="assistant-status" role="status" class="hint">Disponible tras cargar las imágenes en un navegador compatible.</p><p id="assistant-action" class="hint" aria-live="polite"></p></details>
       </section>
     </aside>
   </main>
-  <noscript><p class="noscript-message">Activa JavaScript para visualizar los cortes de resonancia magnética.</p></noscript>
+  <noscript><p class="noscript-message">Activa JavaScript para visualizar las imágenes médicas.</p></noscript>
+  <script type="application/json" id="viewer-config">__VIEWER_CONFIG__</script>
   <script>__EAR_MRI_BUNDLE__</script>
 </body>
 </html>
