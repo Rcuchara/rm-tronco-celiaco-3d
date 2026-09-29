@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node --test scripts/test-webmcp.mjs",
-    "check": "node --check src/viewer.js && node --check src/webmcp.js && npm test && npm run build && node scripts/verify.mjs"
+    "test": "node --test scripts/test-webmcp.mjs scripts/test-ear.mjs",
+    "check": "node --check src/viewer.js && node --check src/webmcp.js && node --check src/ear-mri-viewer.js && npm test && npm run build && node scripts/verify.mjs && node scripts/verify-ear-mri.mjs"
   },
   "dependencies": {
     "three": "0.186.1"

@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -35,3 +35,13 @@ for (const name of ['RM_tronco_celiaco_anotada.png', 'RM_tronco_celiaco_3D_vista
   await copyFile(join(root, 'assets', name), join(site, name));
 }
 console.log(`Built ${join(site, 'index.html')} (${Buffer.byteLength(html)} bytes)`);
+
+const earResult = await build({ entryPoints: [join(root, 'src', 'ear-mri-viewer.js')], bundle: true, minify: true, format: 'iife', platform: 'browser', write: false });
+const earTemplate = await readFile(join(root, 'src', 'ear-mri-template.html'), 'utf8');
+const earCss = await readFile(join(root, 'src', 'ear-mri.css'), 'utf8');
+const earHtml = earTemplate.replace('__EAR_MRI_CSS__', () => earCss).replace('__EAR_MRI_BUNDLE__', () => earResult.outputFiles[0].text);
+if (/__EAR_MRI_/.test(earHtml)) throw new Error('Unreplaced auditory MRI template placeholder.');
+await mkdir(join(site, 'oido'), { recursive: true });
+await writeFile(join(site, 'oido', 'index.html'), earHtml, 'utf8');
+await cp(join(root, 'assets', 'ear', 'mri'), join(site, 'oido', 'data', 'mri'), { recursive: true });
+console.log(`Built auditory MRI viewer: ${join(site, 'oido', 'index.html')}`);

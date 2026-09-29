@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111a">
+  <title>Oído · cortes de resonancia magnética en 3D</title>
+  <style>__EAR_MRI_CSS__</style>
+</head>
+<body>
+  <a class="skip-link" href="#viewer-shell">Ir al visor</a>
+  <header class="app-header">
+    <div>
+      <nav aria-label="Visores"><a href="../">Tronco celíaco · RM</a><a href="./" aria-current="page">Oído · RM</a></nav>
+      <h1>Oído · RM en 3D</h1>
+      <p id="dataset-subtitle">Cortes de resonancia magnética apilados en su posición espacial.</p>
+    </div>
+    <span id="modality-badge" class="badge">RM · preparando datos</span>
+  </header>
+  <main>
+    <section class="viewer-card" id="viewer-shell" tabindex="-1" aria-label="Cortes de resonancia magnética apilados en tres dimensiones">
+      <div class="toolbar">
+        <div class="buttons" role="group" aria-label="Orientación del apilado">
+          <button type="button" data-view="oblique" class="active" aria-pressed="true">Oblicua</button>
+          <button type="button" data-view="axial" aria-pressed="false">De frente al corte</button>
+          <button type="button" data-view="lateral" aria-pressed="false">De perfil</button>
+        </div>
+        <button type="button" id="fullscreen">Pantalla completa</button>
+      </div>
+      <div class="stage-wrap">
+        <div id="stage"><div id="label-layer" aria-hidden="true"></div></div>
+        <canvas id="orientation-canvas" width="100" height="100" role="img" aria-label="Brújula de orientación: derecha, anterior y superior"></canvas>
+        <p class="gesture">Arrastra para girar · rueda para acercar</p>
+        <div id="load-error" class="load-error" hidden role="alert">
+          <h2>No se pudo cargar la resonancia</h2>
+          <p id="load-error-message"></p>
+          <button type="button" id="retry-load">Reintentar</button>
+        </div>
+      </div>
+      <div class="load-strip"><p id="load-status" role="status">Cargando la información del conjunto…</p><progress id="load-progress" max="100" value="0" aria-label="Progreso de carga"></progress></div>
+      <div class="toolbar bottom-toolbar"><div class="buttons"><button type="button" id="fit-view">Encuadrar cortes</button><button type="button" id="reset-view">Restablecer</button></div><button type="button" id="save-image">Guardar PNG</button></div>
+    </section>
+
+    <aside aria-label="Controles de la resonancia">
+      <section class="section">
+        <h2>Resonancia seleccionada</h2>
+        <label class="sr-only" for="dataset-select">Conjunto de resonancia magnética</label>
+        <select id="dataset-select"><option value="mri">Resonancia del oído</option></select>
+        <p id="dataset-summary" class="body-copy">La descripción y la resolución se mostrarán al cargar los datos.</p>
+        <p id="dataset-resolution" class="hint"></p>
+      </section>
+      <section class="section">
+        <h2>Explorar cortes</h2>
+        <div class="row"><label for="slice-range">Posición en el volumen</label><output id="slice-value" for="slice-range">—</output></div>
+        <input id="slice-range" type="range" min="1" max="1" step="1" value="1">
+        <div class="row"><label for="radius-range">Cortes vecinos por lado</label><output id="radius-value" for="radius-range">±10</output></div>
+        <input id="radius-range" type="range" min="0" max="30" step="1" value="10">
+        <p id="visible-count" class="hint">Se muestran el corte seleccionado y sus vecinos.</p>
+        <div class="row"><label for="opacity-range">Opacidad</label><output id="opacity-value" for="opacity-range">72 %</output></div>
+        <input id="opacity-range" type="range" min="5" max="100" step="1" value="72">
+        <div class="row"><label for="spacing-range">Separación visual</label><output id="spacing-value" for="spacing-range">1,0×</output></div>
+        <input id="spacing-range" type="range" min="1" max="3" step="0.1" value="1">
+        <p class="hint">1,0× conserva las distancias de la adquisición. Aumenta la separación para distinguir las capas.</p>
+      </section>
+      <section class="section">
+        <h2 id="selected-title">Corte seleccionado · 2D</h2>
+        <div class="preview-tools" role="group" aria-label="Zoom de la imagen 2D"><button type="button" id="zoom-2d-out" aria-label="Alejar imagen 2D">−</button><output id="zoom-2d-value" aria-live="polite">1×</output><button type="button" id="zoom-2d-in" aria-label="Acercar imagen 2D">+</button><button type="button" id="zoom-2d-reset">Ajustar 2D</button></div>
+        <div id="preview-frame" class="preview-frame"><div id="preview-content"><canvas id="selected-canvas" width="200" height="200" role="img" aria-label="Corte seleccionado de resonancia magnética"></canvas></div></div>
+        <p class="hint">Usa + / − o la rueda para acercar la imagen 2D. Arrastra para recorrerla al ampliar. El zoom no añade resolución.</p>
+        <p id="selected-position" class="hint"></p>
+        <p class="hint">La imagen 2D conserva la intensidad de los datos preparados y la proporción física del corte.</p>
+      </section>
+      <section class="section">
+        <h2>Referencias</h2>
+        <label class="toggle"><input id="references-toggle" type="checkbox" checked><span>Mostrar referencias disponibles</span></label>
+        <div id="reference-list" class="reference-list"><p class="hint">Consultando las referencias de la fuente…</p></div>
+        <p class="hint">Los trazos siguen los contornos originales publicados; los puntos indican el centro de cada región. Se muestran cuando sus cortes están visibles.</p>
+      </section>
+      <section class="section">
+        <details>
+          <summary>Resalte opcional de intensidad</summary>
+          <label class="toggle"><input id="intensity-toggle" type="checkbox"><span>Resaltar señal intensa en 3D</span></label>
+          <div class="row"><label for="threshold-range">Umbral de visualización</label><output id="threshold-value" for="threshold-range">110 / 255</output></div>
+          <input id="threshold-range" type="range" min="0" max="245" step="1" value="110">
+          <p class="hint">Este filtro oculta intensidades bajas en los planos 3D. No identifica estructuras ni crea una segmentación; la imagen 2D permanece sin este filtro.</p>
+        </details>
+      </section>
+      <section class="section">
+        <details open><summary>Fuente y resolución</summary><div id="source-details" class="source-details"></div></details>
+      </section>
+      <section class="section">
+        <details><summary>Control con asistente</summary><p id="assistant-status" role="status" class="hint">Disponible tras cargar la resonancia en un navegador compatible.</p><p id="assistant-action" class="hint" aria-live="polite"></p></details>
+      </section>
+    </aside>
+  </main>
+  <noscript><p class="noscript-message">Activa JavaScript para visualizar los cortes de resonancia magnética.</p></noscript>
+  <script>__EAR_MRI_BUNDLE__</script>
+</body>
+</html>

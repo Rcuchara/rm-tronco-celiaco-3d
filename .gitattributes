@@ -1,0 +1,4 @@
+# Preserve checksummed prepared data byte for byte on every operating system.
+assets/ear/mri/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# This source license is retained verbatim, including its original whitespace.
+assets/ear/mri/TCIA-LICENSE.txt -whitespace
